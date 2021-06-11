@@ -60,7 +60,8 @@ const DropCard = (message, args, client) => {
             )
           }
           let reRollFlag = undefined;
-          if (userCard.count % 3 == 0) {
+
+          if (userCard && userCard.count % 3 == 0) {
             i.lastDropDate = null;
             reRollFlag = true;
           }
