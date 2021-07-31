@@ -44,6 +44,8 @@ function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // messa
         }
     })
     .catch(collected => {
+        let arrInventoryMessagesIndex = InventoryMessages.indexOf(InventoryMessages.find((m) => {return (m.message.id == message.id) }));
+        InventoryMessages.splice(arrInventoryMessagesIndex, 1);
         authorMessage.reply('Время действия инвентаря закончилось');
     });
 }
