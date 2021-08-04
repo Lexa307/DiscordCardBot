@@ -7,10 +7,9 @@ const INVENTORY_TIME = process.env.INVENTORY_TIME;
 function GetPageString(authorId, index) {
     let userCards = GetUserCards(authorId) ; //message.author.id
     if(userCards.length == 0) return `Пока что у вас нет ни одной выбитой карты в инвентаре.`;
-    
     cardString = `Вот что у вас в инвентаре: \n`;
     let strings = [];
-    // let pageCount = Math.ceil(userCards.length / PAGE_SIZE);
+    let pageCount = Math.ceil(userCards.length / PAGE_SIZE);
     let start = PAGE_SIZE * (index);
     let end = PAGE_SIZE * (index + 1);
 
@@ -21,7 +20,7 @@ function GetPageString(authorId, index) {
     let lastPage = "Вот что у вас в инвентаре: \n" ;
     strings.slice(start, end).forEach(card => {lastPage+=card});
 
-    lastPage+=`** страница ${index + 1 } **`; //начинаем показ с последней страницы
+    lastPage+=`** страница ${index + 1 } из ${pageCount}**`;
     return lastPage;
 }
 
@@ -47,6 +46,7 @@ function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // messa
         let arrInventoryMessagesIndex = InventoryMessages.indexOf(InventoryMessages.find((m) => {return (m.message.id == message.id) }));
         InventoryMessages.splice(arrInventoryMessagesIndex, 1);
         authorMessage.reply('Время действия инвентаря закончилось');
+        message.reactions.removeAll();
     });
 }
 
