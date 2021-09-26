@@ -3,6 +3,9 @@ const ReadDBFile = require("../runtime/ReadDBFile.js");
 const InventoryMessages = [];
 const PAGE_SIZE = process.env.PAGE_SIZE;
 const INVENTORY_TIME = process.env.INVENTORY_TIME;
+const classSymbolFill = process.env.CLASS_SYMBOL_FILL;
+const classSymbolVoid = process.env.CLASS_SYMBOL_OF_VOID;
+const totalRareClasses = process.env.RARE_CLASS_NUMBER;
 
 function GetPageString(authorId, index) {
     let userCards = GetUserCards(authorId) ; //message.author.id
@@ -12,9 +15,24 @@ function GetPageString(authorId, index) {
     let pageCount = Math.ceil(userCards.length / PAGE_SIZE);
     let start = PAGE_SIZE * (index);
     let end = PAGE_SIZE * (index + 1);
+    let obj = ReadDBFile();
 
     for(let card of userCards) {
-        strings.push(`**${card.name}**  X${card.count}  <${card.url}> \n`);
+        let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
+        let cardClassString = "";
+        if (cardClassNumber <= totalRareClasses) {
+            let fillCount;
+            for (fillCount = 0; fillCount < cardClassNumber; fillCount++) {
+                cardClassString+= classSymbolFill;
+            }
+    
+            for (fillCount; fillCount < totalRareClasses; fillCount++) {
+                cardClassString+= classSymbolVoid;
+            }
+        }
+
+
+        strings.push(`${cardClassString} **${card.name}**  X${card.count}  <${card.url}> \n`);
     }
 
     let lastPage = "Вот что у вас в инвентаре: \n" ;
