@@ -1,6 +1,6 @@
 const UserCheck = require("../runtime/UserCheck.js");
 const ReadDBFile = require("../runtime/ReadDBFile.js");
-
+const CONSTANTS = require ("../constants/constants.js");
 const NoOneElseHas = (message, args, client) => {
     UserCheck(message.author);
     let obj = ReadDBFile();
@@ -26,7 +26,7 @@ const NoOneElseHas = (message, args, client) => {
 
 module.exports = {
     name: 'undiscovered',
-    usage() { return `${process.env.PREFIX}${this.name}`; },
+    usage() { return `${CONSTANTS.PREFIX}${this.name}`; },
     desc: 'Показывает количество карт, которых нет ни у одного из участников',
     func: NoOneElseHas,
 };

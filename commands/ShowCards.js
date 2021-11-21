@@ -1,36 +1,31 @@
 const UserCheck = require("../runtime/UserCheck.js");
 const ReadDBFile = require("../runtime/ReadDBFile.js");
 const InventoryMessages = [];
-const PAGE_SIZE = process.env.PAGE_SIZE;
-const INVENTORY_TIME = process.env.INVENTORY_TIME;
-const classSymbolFill = process.env.CLASS_SYMBOL_FILL;
-const classSymbolVoid = process.env.CLASS_SYMBOL_OF_VOID;
-const totalRareClasses = process.env.RARE_CLASS_NUMBER;
+const CONSTANTS = require ("../constants/constants.js");
 
 function GetPageString(authorId, index) {
     let userCards = GetUserCards(authorId) ; //message.author.id
     if(userCards.length == 0) return `Пока что у вас нет ни одной выбитой карты в инвентаре.`;
     cardString = `Вот что у вас в инвентаре: \n`;
     let strings = [];
-    let pageCount = Math.ceil(userCards.length / PAGE_SIZE);
-    let start = PAGE_SIZE * (index);
-    let end = PAGE_SIZE * (index + 1);
+    let pageCount = Math.ceil(userCards.length / CONSTANTS.PAGE_SIZE);
+    let start = CONSTANTS.PAGE_SIZE * (index);
+    let end = CONSTANTS.PAGE_SIZE * (index + 1);
     let obj = ReadDBFile();
 
     for(let card of userCards) {
         let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
         let cardClassString = "";
-        if (cardClassNumber <= totalRareClasses) {
+        if (cardClassNumber <= CONSTANTS.CLASS_SYMBOL_OF_VOID) {
             let fillCount;
             for (fillCount = 0; fillCount < cardClassNumber; fillCount++) {
-                cardClassString+= classSymbolFill;
+                cardClassString+= CONSTANTS.CLASS_SYMBOL_FILL;
             }
     
-            for (fillCount; fillCount < totalRareClasses; fillCount++) {
-                cardClassString+= classSymbolVoid;
+            for (fillCount; fillCount < CONSTANTS.CLASS_SYMBOL_OF_VOID; fillCount++) {
+                cardClassString+= CONSTANTS.CLASS_SYMBOL_OF_VOID;
             }
         }
-
 
         strings.push(`${cardClassString} **${card.name}**  X${card.count}  <${card.url}> \n`);
     }
@@ -42,12 +37,18 @@ function GetPageString(authorId, index) {
     return lastPage;
 }
 
+function getUserFromMention(mention) {
+    const matches = mention.match(/^<@!?(\d+)>$/);
+    if (!matches) return;
+    return matches[1]; // user id
+}
+
 function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // message - that message what contains a user inventory
     const filter = (reaction, user) => {
         return ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === authorMessage.author.id;
     };
 
-    message.awaitReactions(filter, {max: 1, time: INVENTORY_TIME })
+    message.awaitReactions(filter, {max: 1, time: CONSTANTS.INVENTORY_TIME })
     .then(collected => {
         const reaction = collected.first();
         if (reaction.emoji.name === '⬅️') {
@@ -61,7 +62,7 @@ function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // messa
         }
     })
     .catch(collected => {
-        let arrInventoryMessagesIndex = InventoryMessages.indexOf(InventoryMessages.find((m) => {return (m.message.id == message.id) }));
+        let arrInventoryMessagesIndex = InventoryMessages.indexOf(InventoryMessages.find( m => {return (m.message.id == message.id) }));
         InventoryMessages.splice(arrInventoryMessagesIndex, 1);
         authorMessage.reply('Время действия инвентаря закончилось');
         message.reactions.removeAll();
@@ -75,7 +76,7 @@ async function ChangeInventoryPage(message, pageDirrection) {
     let lastPage = GetPageString(messageState.authorMessage.author.id, pageIndex);
     messageState.index = pageIndex;
     message.edit(lastPage);
-    let pageCount = Math.ceil(GetUserCards(messageState.authorMessage.author.id).length / PAGE_SIZE);
+    let pageCount = Math.ceil(GetUserCards(messageState.authorMessage.author.id).length / CONSTANTS.PAGE_SIZE);
     if(pageIndex > 0 ) await message.react('⬅️');
     if(pageIndex < pageCount - 1) await message.react('➡️');
     AwaitReactions(message, messageState.authorMessage, pageIndex, pageCount);
@@ -87,20 +88,32 @@ function GetUserCards(userId) {
 }
 
 
-const ShowCard = async (message) => {
+const ShowCard = async (message, args, client) => {
     UserCheck(message.author);
-    let userCards = GetUserCards(message.author.id) ; //message.author.id
-    if(userCards.length == 0) {
-        message.reply(`Пока что у вас нет ни одной выбитой карты в инвентаре.`);
+    let member;
+    if (args[0]) {
+        member = getUserFromMention(args[0]);
+        if (!member) { message.channel.send(error('Для просмотра инвентаря учатника необходимо упомянуть только его')); }
+    } else {
+        member = message.author.id;
+    }
+    if (!UserCheck(member)) {
+        message.reply(`${(member == message.author) ? "вас" : "пользователя"} еще нет в системе, попробуйте использовать другую команду`);
         return;
     }
 
-    cardString = `Вот что у вас в инвентаре: \n`;
-    let pageCount = Math.floor(userCards.length / PAGE_SIZE);
-    let pageIndex = pageCount;
-    let lastPage = GetPageString(message.author.id, pageIndex);
+    let userCards = GetUserCards(member) ; //message.author.id
+    if(userCards.length == 0) {
+        message.reply(`Пока что ${ (args[0])?"у участника":"у вас"} нет ни одной выбитой карты в инвентаре.`);
+        return;
+    }
 
-    message.reply(lastPage).then((mes) => {
+    cardString = `Вот что ${ (args[0]) ? "у " + args[0] : "у вас"} в инвентаре: \n`;
+    let pageCount = Math.floor(userCards.length / CONSTANTS.PAGE_SIZE);
+    let pageIndex = pageCount;
+    let lastPage = GetPageString(member, pageIndex);
+
+    message.reply(lastPage).then( mes => {
         InventoryMessages.push({message: mes, index: pageIndex, authorMessage: message});
         mes.react('⬅️');
         AwaitReactions(mes, message, pageIndex, pageCount);

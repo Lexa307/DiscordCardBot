@@ -1,8 +1,6 @@
 const UserCheck = require("../runtime/UserCheck.js");
 const ReadDBFile = require("../runtime/ReadDBFile.js");
-const classSymbolFill = process.env.CLASS_SYMBOL_FILL;
-const classSymbolVoid = process.env.CLASS_SYMBOL_OF_VOID;
-const totalRareClasses = process.env.RARE_CLASS_NUMBER;
+const CONSTANTS = require ("../constants/constants.js");
 const fs = require('fs');
 
 function daysDiff(dt1, dt2) {
@@ -15,14 +13,14 @@ function daysDiff(dt1, dt2) {
 function showGivenCard(message, card, reRoll = undefined, obj) {
 	let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
 	let cardClassString = "";
-	if (cardClassNumber <= totalRareClasses) {
+	if (cardClassNumber <= CONSTANTS.RARE_CLASS_NUMBER) {
 		let fillCount;
 		for (fillCount = 0; fillCount < cardClassNumber; fillCount++) {
-				cardClassString+= classSymbolFill;
+				cardClassString+= CONSTANTS.CLASS_SYMBOL_FILL;
 		}
 
-		for (fillCount; fillCount < totalRareClasses; fillCount++) {
-				cardClassString+= classSymbolVoid;
+		for (fillCount; fillCount < CONSTANTS.RARE_CLASS_NUMBER; fillCount++) {
+				cardClassString+= CONSTANTS.CLASS_SYMBOL_OF_VOID;
 		}
 	}
 	message.reply(
@@ -94,7 +92,7 @@ const DropCard = (message, args, client) => {
 
 module.exports = {
 	name: 'daikarty',
-	usage() { return `${process.env.PREFIX}${this.name}`; },
+	usage() { return `${CONSTANTS.PREFIX}${this.name}`; },
 	desc: 'Раз в 24 часа рандомная карта помещается вам в инвентарь при использовании этой команды',
 	func: DropCard,
 };

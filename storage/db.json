@@ -1,4 +1,41 @@
 {
 	"users": [],
-	"cards": []
+	"cards": [
+		{
+			"name": ":six_pointed_star::six_pointed_star::six_pointed_star::six_pointed_star::six_pointed_star:№6.Non-standard card",
+			"class": 6,
+			"active": true,
+			"url": "https://cdn.discordapp.com/attachments/852679774128439386/911956118660608010/6.png"
+		},
+		{
+			"name": "№1.Common card",
+			"class": 1,
+			"active": true,
+			"url": "https://cdn.discordapp.com/attachments/852679774128439386/911954481896382504/1.png"
+		},
+		{
+			"name": "№2.Unusual card",
+			"class": 2,
+			"active": true,
+			"url": "https://cdn.discordapp.com/attachments/852679774128439386/911954482122850324/2.png"
+		},
+		{
+			"name": "№3.Rare card",
+			"class": 3,
+			"active": true,
+			"url": "https://cdn.discordapp.com/attachments/852679774128439386/911954482345164831/3.png"
+		},
+		{
+			"name": "№4.Mythical card",
+			"class": 4,
+			"active": true,
+			"url": "https://cdn.discordapp.com/attachments/852679774128439386/911954482672324608/4.png"
+		},
+		{
+			"name": "№5.Legendary card",
+			"class": 5,
+			"active": true,
+			"url": "https://cdn.discordapp.com/attachments/852679774128439386/911954482986877010/5.png"
+		}
+	]
 }
