@@ -8,6 +8,21 @@
  - **помощь** : получить справку о командах бота
  - **undiscovered** : узнать количество карт, которых не выпало ни одному из участников сервера на данный момент
 ## Новости
+ **обновление от *30.11.2021**
+ - В названии карт встроены ссылки, что позволяет использовать url любой длинны без порчи вида сообщения.
+ - Изменен внешний вид для **daikarty**.
+
+![](https://media.discordapp.net/attachments/852679774128439386/915276541347381268/drop.png)
+
+ - Изменен внешний вид для **pokajimne**.
+
+![](https://media.discordapp.net/attachments/852679774128439386/915276541573881896/pokajimne.png)
+
+ - Добавлена возможность просматривать чужой инвентарь(**pokajimne @UserMention**), при условии если данная функция разрешена(параметром в конфиге **INVENTORY_PUBLIC_ACCESS = 1**).
+
+![](https://media.discordapp.net/attachments/852679774128439386/915276541942988840/pokajimne_someone_public.png)
+![](https://media.discordapp.net/attachments/852679774128439386/915276542152699954/pokajimne_someone_private.png)
+
 
  **небольшое обновление от 21.11.2021**
   - Добавлены тестовые карты в **db.json** для примера их добавления. 
@@ -61,6 +76,7 @@ TOKEN = "токен вашего бота"
 PREFIX = '!' 
 PAGE_SIZE = 7
 INVENTORY_TIME = 60000
+INVENTORY_PUBLIC_ACCESS = 1
 RARE_CLASS_NUMBER = 5
 CLASS_SYMBOL_FILL = ":star:"
 CLASS_SYMBOL_OF_VOID = ":small_orange_diamond:"
@@ -68,6 +84,7 @@ CLASS_SYMBOL_OF_VOID = ":small_orange_diamond:"
 
 **PAGE_SIZE** - количество элементов, которые будут умещаться на одной странице инвентаря при показе
 **INVENTORY_TIME** - время бездействия инвентаря, после которого бот перестает листать страницы, указывается в миллисекундах
+**INVENTORY_PUBLIC_ACCESS** - доступ вызова инвентаря другого пользователя **1 - можете использовать pokajimne @UserMention, 0 - другие пользователи могут только сами демонстрировать свой инвентарь в чате**
 
 **RARE_CLASS_NUMBER** - количество классов редкости/ценности
 

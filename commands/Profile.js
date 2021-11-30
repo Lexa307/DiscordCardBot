@@ -36,6 +36,7 @@ const ShowProfile = (message, args, client) => {
     } else {
         member = message.author.id;
     }
+    console.log(member);
     UserCheck(member);
     let obj = ReadDBFile();
     let embed = new Discord.MessageEmbed();
@@ -63,7 +64,7 @@ const ShowProfile = (message, args, client) => {
             let sortedCardArray = userCards.sort((a,b) => {return a.count - b.count});
             let cardClass = obj.cards.find(cardDB => {return cardDB.name == sortedCardArray[sortedCardArray.length -1].name}).class;
             let cardClassString = GetClassString(cardClass);
-            embed.addField(`** Карта, которая больше всего раз выпала : **`, `${(cardClass <= CONSTANTS.RARE_CLASS_NUMBER) ? cardClassString : ""} ${sortedCardArray[sortedCardArray.length -1].name} X${sortedCardArray[sortedCardArray.length - 1].count} ${sortedCardArray[sortedCardArray.length - 1].url }`);
+            embed.addField(`** Карта, которая больше всего раз выпала : **`, `${(cardClass <= CONSTANTS.RARE_CLASS_NUMBER) ? cardClassString : ""} [${sortedCardArray[sortedCardArray.length -1].name}](${sortedCardArray[sortedCardArray.length - 1].url }) X${sortedCardArray[sortedCardArray.length - 1].count} `);
             embed.setImage(sortedCardArray[sortedCardArray.length - 1].url);
             message.reply(embed);
         } else {

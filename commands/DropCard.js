@@ -2,6 +2,7 @@ const UserCheck = require("../runtime/UserCheck.js");
 const ReadDBFile = require("../runtime/ReadDBFile.js");
 const CONSTANTS = require ("../constants/constants.js");
 const fs = require('fs');
+const Discord = require('discord.js');
 
 function daysDiff(dt1, dt2) {
 	dt2 = new Date(dt2);
@@ -10,7 +11,7 @@ function daysDiff(dt1, dt2) {
 	return daysDiff;
 }
 
-function showGivenCard(message, card, reRoll = undefined, obj) {
+function showGivenCard(message, card, reRoll = undefined, obj, client) {
 	let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
 	let cardClassString = "";
 	if (cardClassNumber <= CONSTANTS.RARE_CLASS_NUMBER) {
@@ -23,9 +24,21 @@ function showGivenCard(message, card, reRoll = undefined, obj) {
 				cardClassString+= CONSTANTS.CLASS_SYMBOL_OF_VOID;
 		}
 	}
-	message.reply(
-	`Вам выпала карта с названием: **${cardClassString} ${card.name}**
-	${card.url} ${(reRoll) ? "\n Поздравляю тебе выпало 3 повторки! 👏👏👏  Можешь попытаться выбить еще одну карту прямо сейчас!" : ""}`);
+	client.users.fetch(message.author.id).then(user => {
+		let embed = new Discord.MessageEmbed();
+		embed.setColor("#d1b91f");
+		embed.setAuthor(user.username, user.displayAvatarURL(), user.url);
+		embed.setTitle(`Вам выпала карта с названием: `);
+		embed.setDescription(`**[${cardClassString} ${card.name}](${card.url})**`);
+		embed.setImage(`${card.url}`);
+		embed.setTimestamp(Date.now());
+
+		if (reRoll) embed.addField(`Поздравляю тебе выпало 3 повторки! 👏👏👏 `, `Можешь попытаться выбить еще одну карту прямо сейчас!`);
+		message.reply(embed);
+	})
+	
+	// `Вам выпала карта с названием: **${cardClassString} ${card.name}**
+	// ${card.url} ${(reRoll) ? "\n Поздравляю тебе выпало 3 повторки! 👏👏👏  Можешь попытаться выбить еще одну карту прямо сейчас!" : ""}`);
 }
 
 const DropCard = (message, args, client) => {
@@ -82,7 +95,7 @@ const DropCard = (message, args, client) => {
 					// i.lastDropDate = new Date();
 					let json = JSON.stringify(obj, null, "\t");
 					fs.writeFileSync('./storage/db.json', json, 'utf8');
-					showGivenCard(message, rCard, reRollFlag, obj);
+					showGivenCard(message, rCard, reRollFlag, obj, client);
 				}
 				return;
 		}
