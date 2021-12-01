@@ -2,41 +2,25 @@ const UserCheck = require("../runtime/UserCheck.js");
 const ReadDBFile = require("../runtime/ReadDBFile.js");
 const Discord = require('discord.js');
 const CONSTANTS = require ("../constants/constants.js");
+const ReplaceEmojisFromNameToClass = require("../runtime/ClassFromName.js");
+const GetClassString = require("../runtime/GetClassString.js");
+const GetUserFromMention = require("../runtime/GetUserFromMention.js");
 
 function GetUserCards(userId) {
     let obj = ReadDBFile();
     return obj.users.find((user) => {if (userId == user.id) return user.cards}).cards;
 }
 
-function GetClassString (cardClass) {
-    let cardClassString = "";
-    let fillCount;
-    for (fillCount = 0; fillCount < cardClass; fillCount++) {
-        cardClassString += CONSTANTS.CLASS_SYMBOL_FILL;
-    }
-
-    for (fillCount; fillCount < CONSTANTS.RARE_CLASS_NUMBER; fillCount++) {
-        cardClassString += CONSTANTS.CLASS_SYMBOL_OF_VOID;
-    }
-    return cardClassString;
-}
-
-function getUserFromMention(mention) {
-    const matches = mention.match(/^<@!?(\d+)>$/);
-    if (!matches) return;
-    return matches[1]; // user id
-}
 
 const ShowProfile = (message, args, client) => {
     UserCheck(message.author);
     let member;
     if (args[0]) {
-        member = getUserFromMention(args[0]);
+        member = GetUserFromMention(args[0]);
         if (!member) message.channel.send(error('Для просмотра профиля учатника необходимо упомянуть только его')); 
     } else {
         member = message.author.id;
     }
-    console.log(member);
     UserCheck(member);
     let obj = ReadDBFile();
     let embed = new Discord.MessageEmbed();
@@ -62,10 +46,11 @@ const ShowProfile = (message, args, client) => {
             embed.addField(`** Сколько карт еще не открыто : ${remainingCards}**`, `** **`);
             
             let sortedCardArray = userCards.sort((a,b) => {return a.count - b.count});
-            let cardClass = obj.cards.find(cardDB => {return cardDB.name == sortedCardArray[sortedCardArray.length -1].name}).class;
+            let card = sortedCardArray[sortedCardArray.length -1];
+            let cardClass = obj.cards.find(cardDB => {return cardDB.name == card.name}).class;
             let cardClassString = GetClassString(cardClass);
-            embed.addField(`** Карта, которая больше всего раз выпала : **`, `${(cardClass <= CONSTANTS.RARE_CLASS_NUMBER) ? cardClassString : ""} [${sortedCardArray[sortedCardArray.length -1].name}](${sortedCardArray[sortedCardArray.length - 1].url }) X${sortedCardArray[sortedCardArray.length - 1].count} `);
-            embed.setImage(sortedCardArray[sortedCardArray.length - 1].url);
+            embed.addField(`** Карта, которая больше всего раз выпала : **`, `${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url }) X${card.count} `);
+            embed.setImage(card.url);
             message.reply(embed);
         } else {
             embed.addField('** У пользователя на данный момент нет карт**', `** **`);

@@ -7,6 +7,7 @@ const PAGE_SIZE = process.env.PAGE_SIZE;
 const PREFIX = process.env.PREFIX;
 const TOKEN = process.env.TOKEN;
 const INVENTORY_PUBLIC_ACCESS = parseInt(process.env.INVENTORY_PUBLIC_ACCESS);
+
 module.exports = {
     INVENTORY_TIME,
     CLASS_SYMBOL_FILL,

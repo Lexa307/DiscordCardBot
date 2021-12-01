@@ -3,6 +3,9 @@ const ReadDBFile = require("../runtime/ReadDBFile.js");
 const InventoryMessages = [];
 const CONSTANTS = require ("../constants/constants.js");
 const Discord = require('discord.js');
+const ReplaceEmojisFromNameToClass = require("../runtime/ClassFromName.js");
+const GetClassString = require("../runtime/GetClassString.js");
+const GetUserFromMention = require("../runtime/GetUserFromMention.js");
 
 function GetPageString(authorId, index, memberIsAuthor) {
     let userCards = GetUserCards(authorId) ; //message.author.id
@@ -19,30 +22,12 @@ function GetPageString(authorId, index, memberIsAuthor) {
     embed.addField(`** **`, cardString);
     for(let card of userCards) {
         let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
-        let cardClassString = "";
-        if (cardClassNumber <= CONSTANTS.RARE_CLASS_NUMBER) {
-            let fillCount;
-            for (fillCount = 0; fillCount < cardClassNumber; fillCount++) {
-                cardClassString+= CONSTANTS.CLASS_SYMBOL_FILL;
-            }
-    
-            for (fillCount; fillCount < CONSTANTS.RARE_CLASS_NUMBER; fillCount++) {
-                cardClassString+= CONSTANTS.CLASS_SYMBOL_OF_VOID;
-            }
-        }
-
+        let cardClassString = GetClassString(cardClassNumber);
         strings.push({'cardClassString': cardClassString, name: card.name, count: card.count, url: card.url});
-
     }
-    strings.slice(start, end).forEach(card => {embed.addField(`----------------------------------------------------------------------------`, `[${card.cardClassString}${card.name}](${card.url}) X${card.count}`)});
+    strings.slice(start, end).forEach(card => {embed.addField(`--------------------------------------`, `${(card.cardClassString) ? card.cardClassString : ReplaceEmojisFromNameToClass(card) }[${card.name}](${card.url}) X${card.count}`)});
     embed.addField(`** страница ${index + 1 } из ${pageCount}**`, `** **`)
     return embed;
-}
-
-function getUserFromMention(mention) {
-    const matches = mention.match(/^<@!?(\d+)>$/);
-    if (!matches) return;
-    return matches[1]; // user id
 }
 
 function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // message - that message what contains a user inventory
@@ -97,7 +82,7 @@ const ShowCard = async (message, args, client) => {
     UserCheck(message.author);
     let member;
     if (args[0]) {
-        member = getUserFromMention(args[0]);
+        member = GetUserFromMention(args[0]);
         if (!member) {message.reply('Для просмотра инвентаря учатника необходимо упомянуть только его'); return;}
         if (!CONSTANTS.INVENTORY_PUBLIC_ACCESS &&  member != message.author.id ){message.reply('Вы не можете посмотреть инвентарь участника пока он сам его не откроет при вас'); return;}
     } else {

@@ -3,6 +3,8 @@ const ReadDBFile = require("../runtime/ReadDBFile.js");
 const CONSTANTS = require ("../constants/constants.js");
 const fs = require('fs');
 const Discord = require('discord.js');
+const GetClassString = require("../runtime/GetClassString.js");
+const ReplaceEmojisFromNameToClass = require("../runtime/ClassFromName.js");
 
 function daysDiff(dt1, dt2) {
 	dt2 = new Date(dt2);
@@ -13,23 +15,13 @@ function daysDiff(dt1, dt2) {
 
 function showGivenCard(message, card, reRoll = undefined, obj, client) {
 	let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
-	let cardClassString = "";
-	if (cardClassNumber <= CONSTANTS.RARE_CLASS_NUMBER) {
-		let fillCount;
-		for (fillCount = 0; fillCount < cardClassNumber; fillCount++) {
-				cardClassString+= CONSTANTS.CLASS_SYMBOL_FILL;
-		}
-
-		for (fillCount; fillCount < CONSTANTS.RARE_CLASS_NUMBER; fillCount++) {
-				cardClassString+= CONSTANTS.CLASS_SYMBOL_OF_VOID;
-		}
-	}
+	let cardClassString = GetClassString(cardClassNumber);
 	client.users.fetch(message.author.id).then(user => {
 		let embed = new Discord.MessageEmbed();
 		embed.setColor("#d1b91f");
 		embed.setAuthor(user.username, user.displayAvatarURL(), user.url);
 		embed.setTitle(`Вам выпала карта с названием: `);
-		embed.setDescription(`**[${cardClassString} ${card.name}](${card.url})**`);
+		embed.setDescription(`**${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url})**`);
 		embed.setImage(`${card.url}`);
 		embed.setTimestamp(Date.now());
 
