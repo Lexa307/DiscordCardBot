@@ -5,6 +5,8 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const GetClassString = require("../runtime/GetClassString.js");
 const ReplaceEmojisFromNameToClass = require("../runtime/ClassFromName.js");
+const configLocalTime = CONSTANTS.RESET_LOCAL_TIME;
+const ReturnRequeredUTCDateToReset = require("../runtime/TimeDiff.js");
 
 function daysDiff(dt1, dt2) {
 	dt2 = new Date(dt2);
@@ -28,9 +30,6 @@ function showGivenCard(message, card, reRoll = undefined, obj, client) {
 		if (reRoll) embed.addField(`Поздравляю тебе выпало 3 повторки! 👏👏👏 `, `Можешь попытаться выбить еще одну карту прямо сейчас!`);
 		message.reply(embed);
 	})
-	
-	// `Вам выпала карта с названием: **${cardClassString} ${card.name}**
-	// ${card.url} ${(reRoll) ? "\n Поздравляю тебе выпало 3 повторки! 👏👏👏  Можешь попытаться выбить еще одну карту прямо сейчас!" : ""}`);
 }
 
 const DropCard = (message, args, client) => {
@@ -52,17 +51,19 @@ const DropCard = (message, args, client) => {
 					i.lastDropDate = new Date();
 					update = true;
 				} else {
-					if(daysDiff(new Date(), i.lastDropDate ) <= -1) {
+					if(!(configLocalTime[0]) && daysDiff(new Date(), i.lastDropDate ) <= -1) {
 						i.lastDropDate = new Date();
 						update = true;
 					} else {
-						let remainingTime = new Date(i.lastDropDate).setMilliseconds(new Date(i.lastDropDate).getMilliseconds() + 86400000 ) - Date.now();
+						let lastDropDate = new Date(i.lastDropDate);
+						lastDropDate.setDate(lastDropDate.getDate() + 1);
+						let remainingTime =  (!(configLocalTime[0]) ? lastDropDate : ReturnRequeredUTCDateToReset()) - Date.now();
 						let remainingHours = Math.floor( remainingTime / 3600000);
 						remainingTime -= remainingHours * 3600000;
 						let remainingMinutes = Math.floor(remainingTime / 60000);
 						remainingTime -= remainingMinutes * 60000;
 						let remainingSecs = Math.floor(remainingTime / 1000);
-						message.reply(`Сегодня вы уже получали карту, но вы можете попытать удачу через: ${remainingHours}ч ${remainingMinutes }м ${remainingSecs }с`);
+						message.reply(`Сейчас у вас не получится получить карту, но вы можете попытать удачу через: ${remainingHours}ч ${remainingMinutes }м ${remainingSecs }с`);
 					}
 				}
 				if (update) {
