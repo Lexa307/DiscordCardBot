@@ -1,53 +1,48 @@
 const Discord = require('discord.js');
 const fs = require('fs');
-require('dotenv').config();
-const client = new Discord.Client({fetchAllMembers: true});
-const prefix = process.env.PREFIX;
-const UserCheck = require("./runtime/UserCheck.js")
-
-const BotCommands = [];
-let f = fs.readFileSync('./storage/db.json', 'utf8');
-
-BotCommands.push(
+const Client = new Discord.Client({fetchAllMembers: true});
+const CONSTANTS = require('./constants/constants.js');
+const UserCheck = require("./utils/UserCheck.js");
+const LOCALES = require("./constants/locales.js");
+const BOT_COMMANDS = [];
+BOT_COMMANDS.push(
     {
-      name: 'помощь',
-      usage() { return `${process.env.PREFIX}${this.name}`; },
-      desc: 'Показывает какие команды имеются у бота',
-      func(message) {
-        const helpEmbed = new Discord.MessageEmbed()
-          .setTitle('Команды бота')
-          .setColor('#84cc64');
-        for (let i = 0; i < BotCommands.length; i++) helpEmbed.addField(BotCommands[i].usage(), BotCommands[i].desc, false);
-        message.channel.send(helpEmbed);
-      },
+        name: `${LOCALES.Help__EXPORTS__name[CONSTANTS.LANG]}`,
+        usage() { return `${CONSTANTS.PREFIX}${this.name}`; },
+        desc: `${LOCALES.Help__EXPORTS__desc[CONSTANTS.LANG]}`,
+        func(message) {
+            const helpEmbed = new Discord.MessageEmbed()
+                .setTitle(`${LOCALES.Help__MessageEmbed_commands[CONSTANTS.LANG]}`)
+                .setColor('#84cc64');
+            for (let i = 0; i < BOT_COMMANDS.length; i++) {
+                if ( (!message.member.hasPermission('ADMINISTRATOR') && !BOT_COMMANDS[i].permission) || message.member.hasPermission('ADMINISTRATOR') )
+                    helpEmbed.addField(BOT_COMMANDS[i].usage(), BOT_COMMANDS[i].desc, false);
+            } 
+            message.channel.send(helpEmbed);
+        },
     },
 );
 
-
-
-client.on('ready', () => {
-    console.log('Ready');
-    client.generateInvite().then((i) => console.log(i));
+Client.on('ready', () => {
+	console.log('Ready');
+	Client.generateInvite().then((i) => console.log(i));
 });
 
-client.on('guildMemberAdd', member => {
-  UserCheck(member.user);
+Client.on('guildMemberAdd', member => {
+	UserCheck(member.user.id);
 });
-
 
 fs.readdir(`${__dirname}/commands`, (err, file) => {
     for (let i = 0; i < file.length; i++) {
-      BotCommands.push(require(`./commands/${file[i]}`));
+        BOT_COMMANDS.push(require(`./commands/${file[i]}`));
     }
 });
 
-// 847070015378817024
 
-client.on('message', (message) => {
-const args = message.content.slice(prefix.length).trim().split(/ +/g);
-const command = args.shift().toLowerCase();
-const cmd = BotCommands.find((botcommand) => (botcommand.name === command));
-if (cmd) cmd.func(message, args, client);
+Client.on('message', (message) => {
+	const args = message.content.slice(CONSTANTS.PREFIX.length).trim().split(/ +/g);
+	const command = args.shift().toLowerCase();
+	const cmd = BOT_COMMANDS.find((botcommand) => (botcommand.name === command));
+	if (cmd) cmd.func(message, args, Client);
 });
-client.login(process.env.TOKEN);
-
+Client.login(CONSTANTS.TOKEN);

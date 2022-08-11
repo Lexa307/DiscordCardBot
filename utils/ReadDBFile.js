@@ -1,6 +1,6 @@
 let fs = require('fs');
 
-function ReadDBFile() {
+module.exports = function ReadDBFile() {
     let obj;
     try {
         let f = fs.readFileSync('./storage/db.json', 'utf8');
@@ -9,6 +9,4 @@ function ReadDBFile() {
         return undefined;
     }
     return obj
-}
-
-module.exports = ReadDBFile;
+};

@@ -1,16 +1,17 @@
-const UserCheck = require("../runtime/UserCheck.js");
-const ReadDBFile = require("../runtime/ReadDBFile.js");
+const UserCheck = require("../utils/UserCheck.js");
+const ReadDBFile = require("../utils/ReadDBFile.js");
 const InventoryMessages = [];
 const CONSTANTS = require ("../constants/constants.js");
 const Discord = require('discord.js');
-const ReplaceEmojisFromNameToClass = require("../runtime/ClassFromName.js");
-const GetClassString = require("../runtime/GetClassString.js");
-const GetUserFromMention = require("../runtime/GetUserFromMention.js");
+const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
+const GetClassString = require("../utils/GetClassString.js");
+const GetUserFromMention = require("../utils/GetUserFromMention.js");
+const LOCALES = require('../constants/locales.js');
 
 function GetPageString(authorId, index, memberIsAuthor) {
     let userCards = GetUserCards(authorId) ; //message.author.id
-    if(userCards.length == 0) return `Пока что у вас нет ни одной выбитой карты в инвентаре.`;
-    cardString = `**Вот что у ${(!memberIsAuthor) ? '<@!'+authorId+ '>' : 'вас' } в инвентаре:**`;
+    if(userCards.length == 0) return `${LOCALES.ShowCards__MessageEmbed__no_cards[CONSTANTS.LANG]}`;
+    cardString = `**${LOCALES.ShowCards__MessageEmbed__cards_in_inventary1[CONSTANTS.LANG]}${(!memberIsAuthor) ? '<@!'+authorId+ '>' : `${LOCALES.ShowCards__MessageEmbed__cards_in_inventary2[CONSTANTS.LANG]}` } ${LOCALES.ShowCards__MessageEmbed__cards_in_inventary3[CONSTANTS.LANG]}**`;
     let strings = [];
     let pageCount = Math.ceil(userCards.length / CONSTANTS.PAGE_SIZE);
     let start = CONSTANTS.PAGE_SIZE * (index);
@@ -26,7 +27,7 @@ function GetPageString(authorId, index, memberIsAuthor) {
         strings.push({'cardClassString': cardClassString, name: card.name, count: card.count, url: card.url});
     }
     strings.slice(start, end).forEach(card => {embed.addField(`--------------------------------------`, `${(card.cardClassString) ? card.cardClassString : ReplaceEmojisFromNameToClass(card) }[${card.name}](${card.url}) X${card.count}`)});
-    embed.addField(`** страница ${index + 1 } из ${pageCount}**`, `** **`)
+    embed.addField(`** ${LOCALES.ShowCards__MessageEmbed__page[CONSTANTS.LANG]} ${index + 1 } / ${pageCount}**`, `** **`)
     return embed;
 }
 
@@ -40,7 +41,7 @@ function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // messa
         const reaction = collected.first();
         if (reaction.emoji.name === '⬅️') {
             reaction.users.remove(authorMessage.author.id);
-            if((pageIndex - 1) == 0) reaction.remove();
+            if((pageIndex - 1) <= 0) reaction.remove();
             ChangeInventoryPage(message, -1);
         } else {
             reaction.users.remove(authorMessage.author.id);
@@ -51,7 +52,7 @@ function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // messa
     .catch(collected => {
         let arrInventoryMessagesIndex = InventoryMessages.indexOf(InventoryMessages.find( m => {return (m.message.id == message.id) }));
         InventoryMessages.splice(arrInventoryMessagesIndex, 1);
-        authorMessage.reply('Время действия инвентаря закончилось');
+        authorMessage.reply(`${LOCALES.ShowCards__MessageEmbed__inventory_is_over[CONSTANTS.LANG]}`);
         message.reactions.removeAll();
     });
 }
@@ -79,24 +80,24 @@ function GetUserCards(userId) {
 
 
 const ShowCard = async (message, args, client) => {
-    UserCheck(message.author);
+    UserCheck(message.author.id);
     let member;
     if (args[0]) {
         member = GetUserFromMention(args[0]);
-        if (!member) {message.reply('Для просмотра инвентаря учатника необходимо упомянуть только его'); return;}
-        if (!CONSTANTS.INVENTORY_PUBLIC_ACCESS &&  member != message.author.id ){message.reply('Вы не можете посмотреть инвентарь участника пока он сам его не откроет при вас'); return;}
+        if (!member) {message.reply(`${LOCALES.ShowCards__MessageEmbed__incorrect_user[CONSTANTS.LANG]}`); return;}
+        if (!CONSTANTS.INVENTORY_PUBLIC_ACCESS &&  member != message.author.id ){message.reply(`${LOCALES.ShowCards__MessageEmbed__access_denied[CONSTANTS.LANG]}`); return;}
     } else {
         member = message.author.id;
     }
     let authorIsMember = member == message.author.id;
-    if (!UserCheck(member)) {
-        message.reply(`${(authorIsMember) ? "вас" : "пользователя"} еще нет в системе, попробуйте использовать другую команду`);
-        return;
-    }
+    // if (!UserCheck(member)) {
+    //     message.reply(`${(authorIsMember) ? "вас" : "пользователя"} еще нет в системе, попробуйте использовать другую команду`);
+    //     return;
+    // }
 
     let userCards = GetUserCards(member) ; //message.author.id
     if(userCards.length == 0) {
-        message.reply(`Пока что ${ (args[0])?"у участника":"у вас"} нет ни одной выбитой карты в инвентаре.`);
+        message.reply(`${ (args[0])?`${LOCALES.ShowCards__MessageEmbed__no_cards2[CONSTANTS.LANG]}`:`${LOCALES.ShowCards__MessageEmbed__no_cards3[CONSTANTS.LANG]}`} ${LOCALES.ShowCards__MessageEmbed__no_cards4[CONSTANTS.LANG]}`);
         return;
     }
 
@@ -113,8 +114,8 @@ const ShowCard = async (message, args, client) => {
 }
 
 module.exports = {
-    name: 'pokajimne',
+    name: `${LOCALES.ShowCards__EXPORTS__name[CONSTANTS.LANG]}`,
     usage() { return `${CONSTANTS.PREFIX}${this.name} || ${CONSTANTS.PREFIX}${this.name} @UserMention `; },
-    desc: 'Показывает карты, находящиеся у вас или у @UserMention в инвентаре',
+    desc: `${LOCALES.ShowCards__EXPORTS__desc[CONSTANTS.LANG]}`,
     func: ShowCard,
 };

@@ -1,6 +1,7 @@
-const fs = require('fs');
 const ReadDBFile = require("./ReadDBFile.js");
-
+const SaveObjToDB = require("./SaveObjToDB.js");
+const LOCALES = require("../constants/locales.js");
+const CONSTANTS = require("../constants/constants.js");
     /* User db.json reference
     User {
         users: [
@@ -21,18 +22,17 @@ const ReadDBFile = require("./ReadDBFile.js");
     }
     */
 
-const RegisterUser = (user) => {
-    let obj = ReadDBFile();
-    if(!obj) return;
-    obj.users.push(
+const RegisterUser = (user, dbObj = ReadDBFile()) => {
+    if(!dbObj) return;
+    dbObj.users.push(
         {
-            id: user.id,
+            id: user,
             cards: [],
             lastDropDate: null
         }
     )
-    let json = JSON.stringify(obj, null, "\t");
-    fs.writeFileSync('./storage/db.json', json, 'utf8');
+    SaveObjToDB(dbObj);
+    console.log(`${user} ${LOCALES.RegisterUser__MessageEmbed_registered[CONSTANTS.LANG]}`)
 }
 
 module.exports = RegisterUser;
