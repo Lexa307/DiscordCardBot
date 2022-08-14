@@ -1,184 +1,184 @@
 # DiscordCardBot
-Простенький бот, позволяющий коллекционировать карты участниками сервера.
-[Настройка проекта](#Настройка-проекта) [en-README](./README.md)
-## Описание
-Участник дискорд сервера может при использовании команд этого бота:
- - [дайкарту](#дайкарту) : получить коллекционную карту 1 раз в 24 часа или просмотреть через сколько времени он ее сможет получить
- - [покажимне](#покажимне) :просмотреть список и количество карт одного типа, которые он уже получил
- - [профиль](#профиль) : просмотреть статистику пользователя сервера по выпавшим картам 
- - [помощь](#помощь) : получить справку о командах бота
- - [неисследовано](#неисследовано) : узнать количество карт, которых не выпало ни одному из участников сервера на данный момент 
- - [выдайкарту](#выдайкарту) : выдать 1 карту указанному пользователю
- - [активируй](#активируй-Code) : активировать код для получения шанса получить катру еще раз
- - [создатькод](#создатькод) : создать код, который могут использовать пользователи для получения возможности получить карту
- - [удалитькарту](#удалитькарту-CardName) : удалить карту из системы и у всех пользователей
- - [новаякарта](#новаякарта) : добавить в пул выпадения карт новую карту
- - [изменитькарту](#изменитькарту) : изменить существующую карту в системе и у всех пользователей
- - [обновикрутки](#обновикрутки) : дать возможность всем или конкретному пользователю получить карту
-### дайкарту
-Выдает рандомную карту из пула существующих в системе карточек 1 раз в 24 часа или же 1 раз в день в определенное время в зависимости от настройки бота.
-У этой команды присутствует механика, при которой если пользователь получает 3ю повторяющуюся карту, то система дает шанс использовать эту команду еще раз.
-![](https://media.discordapp.net/attachments/852679774128439386/1008089528965267487/unknown.png)
-### покажимне [@UserMention]
-При вводе команды **без аргументов** показывает инвентарь пользователя - **автора сообщения**.
+A simple bot that allows you to collect cards by server participants.
+[Project Setup](#Project-Setup) [ru-README](./RU-README.md)
+## Description
+Commands available to discord server participants:
+ - [drop](#drop) : get a card 1 time in 24 hours or view after how long it can be received
+ - [show](#show) : view the list and number of cards of the same type that user has already received
+ - [profile](#profile) : view statistics of the server user on the drawn cards
+ - [help](#help) : get help about bot commands
+ - [undiscovered](#undiscovered) : find out the number of cards that have not fallen to any of the server participants
+ - [giveacard](#giveacard) : issue 1 card to the specified user
+ - [activate](#activate-Code) : activate the code for a chance to get the card again
+ - [createcode](#createcode) : create a code that users can use to be able to get a card
+ - [deletecard](#deletecard-CardName) : remove the card from the system and from all users
+ - [addcard](#addcard) : add a new card to the card drop pool
+ - [editcard](#editcard) : change an existing map in the system and for all users
+ - [resetdrop](#resetdrop) : cooldown reset of drop for everyone or a specific user
+### drop
+Drops a random card from the pool of cards existing in the system 1 time every 24 hours or 1 time a day at a certain time, depending on the bot settings.
+This command has a mechanic in which if the user receives the 3rd repeating card, the system gives a chance to use this command again.
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008477525267198014/unknown.png)
+### show [@UserMention]
+When entering a command without arguments, it shows the inventory of the user - the author of the message.
 
-При добавлении в качестве аргумента **упоминания пользователя(через @)** покажет инвентарь указанного пользователя (при условии что админ включил данную возможность в конфиге: **INVENTORY_PUBLIC_ACCESS = 1** )
+When adding a user mention as an argument (via @), the inventory of the specified user will be shown (provided that the admin has enabled this feature in the config: INVENTORY_PUBLIC_ACCESS = 1 )
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008397459397017600/unknown.png)
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008502106547818636/unknown.png)
 
-Инвентарь имеет страничный интерфейс, где страницы меняются путем добавлений реакций стрелочек(⬅️ и ➡️) которые предлагает бот, страницы меняются только в том случае если реацкцию под сообщением с инвентарем оставил автор отправленной команды.
-Спустя некоторое время (которое настраивается в конфиге: **INVENTORY_TIME**) при бездействии инвентаря - отсутсвтие активного переключения страниц, инвентарь перестает работать, и для того чтобы еще раз его посмотреть нужно снова ввести нужную команду.  
+The inventory has a page interface, where the pages are changed by adding the reactions of arrows ( ⬅️ and ➡️ ) that the bot offers, the pages change only if the response under the message with the inventory was left by the author of the sent command.
+After some time (which is configured in the config: **INVENTORY_TIME**), when the inventory is inactive, there is no active page switching, the inventory stops working, and in order to view it again, you need to enter the necessary command again. 
  
-### профиль [@UserMention]
- Показывает профиль указанного пользователя или автора сообщения со статистикой собранных карт за все время.
+### profile [@UserMention]
+Shows the profile of the specified user or the author of the message with statistics of the collected cards for all time.
 
-![](https://media.discordapp.net/attachments/852679774128439386/1008119707318091816/unknown.png) 
+![](https://media.discordapp.net/attachments/852679774128439386/1008503033279299625/unknown.png) 
  
-### помощь
-Выводит перечень всех команд, доступных автору сообщения.
-Если помощь запросил администратор сервера, то бот выведет расширенный список команд.
+### help
+Displays a list of all commands available to the author of the message.
+If the server administrator has requested help, the bot will display an expanded list of commands.
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008404455957483602/unknown.png)
+![](https://media.discordapp.net/attachments/852679774128439386/1008503228532543558/unknown.png)
 
-### неисследовано 
-Выводит количество карт, которых нет ни у одного из зарегистрированных участников.
+### undiscovered 
+Displays the number of cards that none of the registered participants have.
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008407426413891654/unknown.png)
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008503947549495376/unknown.png)
 
-### выдайкарту @UserMention CardName
-Выдает указанному пользователю карту, найденную по вписанному имени(или части имени).
+### giveacard @UserMention CardName
+Gives the specified user a card found by the entered name (or part of the name).
 
-Команду может использовать **только администратор сервера**. Для использования этой функции нужны 2 обязательных аргумента:
- - @UserMention: пользователь которому будет выдаваться карта
- - CardName: название карты, которая будет выдана в количестве 1 штуки пользователю. Этот аргумент может принимать неполное название карты, система найдет наиболее подоходящую по введеному имени карты
+The command can be used **only by the server administrator**. To use this function, you need 2 required arguments:
+ - @UserMention: the user to whom the card will be issued
+ - CardName: the name of the card that will be issued in the amount of 1 to the user. This argument can take an incomplete name of the card, the system will find the most suitable one by the entered name of the card
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008408519663431681/unknown.png)
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008505520358948985/unknown.png)
 
-### активируй Code
-Активация кода, созданного администратором, при успешной активации пользователем обнуляет ему кулдаун для использования команды **дайкарту**
+### activate Code
+Activation of the code created by the administrator, upon successful activation by the user, resets his cooldown for using the **drop** command
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008413555302879302/unknown.png)
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008507041159057428/unknown.png)
 
-### создатькод [-c] [-u] [-d]
-Создает специальный код который могут активировать пользователи для получения возможности сбросить кулдаун команды **дайкарту**
-Этой командой может воспользоваться только администратор при этом ему доступны для использования 3 необязательных параметра которые можно использовать в любом порядке для установки ограничений на использование кода:
- - -cCodeName : кастомное название кода
- - -uUsingCount : количество уникальных пользователей, которые могу использовать код
- - -dmm/dd/yyyy : дата истечения срока годности кода, после которой пользователи не смогут его использовать
+### createcode [-c] [-u] [-d]
+Creates a special code that users can activate to be able to reset the cooldown of the **drop command**
+This command can only be used by the administrator, while 3 optional parameters are available to him for use, which can be used in any order to set restrictions on the use of the code:
+ - -cCodeName : custom code name
+ - -uUsingCount : the number of unique users who can use the code
+ - -dmm/dd/yyyy : the expiration date of the code, after which users will not be able to use it
 
-![](https://media.discordapp.net/attachments/852679774128439386/1008413384590503957/unknown.png)
+![](https://media.discordapp.net/attachments/852679774128439386/1008506789672779826/unknown.png)
 
-По умолчанию создается автоматически сгенерированный код без срока годности на 1 использование.
+By default, an automatically generated code is created with no expiration date for 1 use.
 
-![](https://media.discordapp.net/attachments/852679774128439386/1008418844068544582/unknown.png)
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008507346982547466/unknown.png)
 
-### удалитькарту CardName
-Админская команда, удаляющая из системы и у всех пользователей указанную карту.
+### deletecard CardName
+The admin command that removes the specified card from the system and from all users.
 
-Данная команда требует 1 обязательный аргумент - **полное название карты.**
+This command requires 1 mandatory argument - **the full name of the card.**
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008423799160582265/unknown.png)
+![](https://cdn.discordapp.com/attachments/852679774128439386/1008512987608403998/unknown.png)
 
-**Если в названии карты есть пробел, то вместо него используйте ";" тк пробел служит для разделения аргументов.**
+**If there is a space in the name of the card, then use ";" instead, because the space is used to separate arguments.**
 
-### новаякарта CardName ClassNumber [ImageSourceLink]
-Админ сервера может создать новую карту, которая автоматически помещается в пул выпадения карт.
-Аргументы команды:
- - CardNameCardName **название новой карты**, (обязательный) - не должно совпадать с существующим именем карты в базе, для добавления пробела используйте символ ";" 
- - ClassNumber **класс карты**, (обязательный) должно быть числом от  1 до 5 - стандартные классы карт, другие значения сделают картой нестандартного класса
- - ImageSourceLink **ссылка на картинку .png .jpg .gif**, обязательный аргумент, который можно не вводить при условии, что к сообщению этой команды во вложение прикреплена картинка.
+### addcard CardName ClassNumber [ImageSourceLink]
+The server admin can create a new card that is automatically placed in the card drop pool.
+Command arguments:
+ - CardNameCardName **name of the new card**, (required) - must not match the existing name of the card in the database, use the ";" symbol to add a space
+ - ClassNumber **card class**, (required) it should be a number from 1 to 5 - standard classes of cards, other values will make a card of a non-standard class
+ - ImageSourceLink **link to the picture .png .jpg .gif**, a mandatory argument that can be omitted provided that a picture is attached to the message of this command in the attachment.
 
-![](https://media.discordapp.net/attachments/852679774128439386/1008427304545955962/unknown.png)
+![](https://media.discordapp.net/attachments/852679774128439386/1008514371703541780/unknown.png)
  
- ### изменитькарту CardName editCardName editClassNumber [editImageSourceLink]
- Команда доступная только администратору, созданная для изменения данных существующих карт, требует следующие аргументы:
- - CardName (обязательный) - полное название карты которую требуется изменить
- - editCardName (обязательный) - новое название карты, если не хотите менять вставьте то которое есть (напоминание использовать ";" вместо пробела)
- - editClassNumber - новый класс карты, должно быть числом
- - editImageSourceLink - новое изображение (ссылка на изображение) для отображения
+ ### editcard CardName editCardName editClassNumber [editImageSourceLink]
+A command accessible only to the administrator, created to change the data of existing maps, requires the following arguments:
+ - CardName (required) - full name of the card to be changed
+ - editCardName (required) - the new name of the card, if you do not want to change, insert the one that is (a reminder to use ";" instead of a space)
+ - editClassNumber - (required) new card class, must be a number
+ - editImageSourceLink (required) - new image (link to image) to display
 
-![](https://media.discordapp.net/attachments/852679774128439386/1008434737418870914/unknown.png)
+![](https://media.discordapp.net/attachments/852679774128439386/1008515485215764480/unknown.png)
 
- ### обновикрутки [@UserMention]
-Сбрасывает кулдаун команды **дайкарту** для всех пользователей или только указанному. (Доступно только администратору)
+ ### resetdrop [@UserMention]
+Resets the cooldown of the **drop** command for all users or only the specified one. (Available only to the administrator)
 
-![](https://cdn.discordapp.com/attachments/852679774128439386/1008436051947303073/unknown.png)
+![](https://media.discordapp.net/attachments/852679774128439386/1008515882055651358/unknown.png)
 
-## Новости
- **Крупное обновление от 11.08.2022**
- - Добавлено администрирование карт при помощи команд(добавление, изменение и удаление)
- - Добавлена возможность выбора языка и добавления своей локализации, сейчас бот поддерживает русский и английский языки.
- - Добавлена возможность создания/активации специальных кодов которые могут использовать пользователи для получения круток
- - Добавлена функция обнуления кулдауна выдачи карт всем пользователям или какому-нибудь конкретному
- - Исправлены ошибки с регистрацией пользователей и влекших за собой остановку работы бота, добавлены новые)
- - Добавлено отображение количества нестандартных карт в профиле пользователя
- - При получении карты теперь указывается сколько таких же пользователь имеет в инвентаре
+## News
+ **Major update from 08.11.2022**
+ - Added administration of cards using commands (add, change and delete)
+ - Added the ability to select a language and add your own localization, now the bot supports Russian and English.
+ - Added the ability to create/activate special codes that users can use to get one more card
+ - Added the function of reseting the cooldown of issuing cards to all users or to some specific
+ - Fixed errors with user registration and caused the bot to stop working, added new ones)
+ - Added display of the number of non-standard cards in the user profile
+ - When receiving a card, it is now indicated how many of the same the user has in the inventory
 
 
- **фича от 09.12.2021**
- - теперь можно установить серверное время в момент которого, таймер всех пользователей для получения карты(**дайкарту**) обнуляется.
- 
- **обновление от 30.11.2021**
- - В названии карт встроены ссылки, что позволяет использовать url любой длинны без порчи вида сообщения.
- - Исправлен баг, при котором не отображалась ценность(**class**) карт символами/эмодзи в **покажимне**.
- - Убрано отображение url в **профиль** (теперь ссылка в названии карты).
- - Изменен внешний вид для **дайкарту**.
+ **feature from 09.12.2021**
+ - now you can set the server time at which the timer of all users to receive the card (**drop**) is reset.
+
+ **update from 11/30/2021**
+ - Links are embedded in the name of the cards, which allows you to use urls of any length without spoiling the type of message.
+ - Fixed a bug where the value (**class**) of cards with symbols/emojis in **show me** was not displayed.
+ - Removed the url display in **profile** (now the link is in the name of the map).
+ - Changed the appearance for **drop**.
 
 ![](https://media.discordapp.net/attachments/852679774128439386/915276541347381268/drop.png)
 
- - Изменен внешний вид для **покажимне**.
+ - Changed the appearance for **show**.
 
 ![](https://media.discordapp.net/attachments/852679774128439386/915276541573881896/покажимне.png)
 
- - Добавлена возможность просматривать чужой инвентарь(**покажимне @UserMention**), при условии если данная функция разрешена(параметром в конфиге **INVENTORY_PUBLIC_ACCESS = 1**).
+ - Added the ability to view someone else's inventory (**show me @UserMention**), provided that this function is allowed (by the parameter in the config **INVENTORY_PUBLIC_ACCESS = 1**).
 
- **небольшое обновление от 21.11.2021**
-  - Добавлены тестовые карты в **db.json** для примера их добавления. 
+ **a small update from 11.21.2021**
+ - Added test cards to **db.json** for an example of adding them.
 
 ![](https://cdn.discordapp.com/attachments/852679774128439386/911969469914574939/unknown.png)
 
-  - Добавлено отображение количества карт каждого класса при просмотре профиля(**профиль**).
+ - Added display of the number of cards of each class when viewing the profile (**profile**).
 
 ![](https://cdn.discordapp.com/attachments/852679774128439386/911967665906651166/unknown.png)
 
- **фича от 06.10.2021**
-  - Добавлена команда **undiscovered**. Выводит количество карт, которых на сервере еще никому не удавалось получить.
+ **feature from 06.10.2021**
+ - Added the **undiscovered** command. Displays the number of cards that no one has been able to get on the server yet.
 
 ![](https://cdn.discordapp.com/attachments/852679774128439386/895117207615471666/unknown.png)
 
- **фича от 26.09.2021**
-  - Добавлена команда **профиль** [@UserMention]. Выводит профиль пользователя, содержащий информацию:
-      - сколько карт всего выпало;
-      - какое количество карт выпало определенного класса;
-      - количество карт, которых пользователь еще не открыл;
-      - карта, котороая больше всего раз выпала.
-  - Добавлены поля для карт: **class**(класс карты), предназначенные для определения ценности/редкости карты.
+ **feature from 09.26.2021**
+ - added the **profile** [@UserMention] command. Displays a user profile containing information:
+ - how many cards have fallen out in total;
+ - how many cards of a certain class have fallen out;
+ - the number of cards that the user has not opened yet;
+ - the card that fell out the most times.
+ - added fields for cards: **class** (card class), designed to determine the value /rarity of the card.
 
- **небольшое обновление от 04.08.2021**
- - При просмотре инвентаря теперь показывается не только текущая страница, но и сколько всего страниц доступно.
- - При истечении срока работы инвентаря все реакции, прикрепленные к сообщению удаляются.
+ **a small update from 08.04.2021**
+ - When viewing the inventory, not only the current page is now shown, but also how many pages are available in total.
+ - When the inventory expires, all reactions attached to the message are deleted.
 
- **фича от 31.07.2021**
- - Чтобы не превышать максимальное количество символов в сообщении для API Discord`а был введен "страничный" инвентарь:
-после ввода команды о запросе показать инвентарь, бот показывает вам последнюю страницу инвентаря, в которой содержатся ваши недавно полученные коллекционные карты. Вы можете перелистывать страницы инвентаря при помощи реакций(⬅️ и ➡️) в сообщении с вашими картами. Учтите, бот не будет бесконечно ждать, когда вы соизволете пролистнуть страницу, через некоторое время он перестанет реагировать на новые реакции, и вам придется запросить инвентарь командой снова.
+ **feature from 31.07.2021**
+ - In order not to exceed the maximum number of characters in the message, a "page" inventory was introduced for the Discord API:
+after entering the command about the show inventory request, the bot shows you the last inventory page, which contains your recently received collectible cards. You can flip through the inventory pages using the reactions ( ⬅️ and ➡️ ) in the message with your cards. Keep in mind, the bot will not wait indefinitely for you to scroll through the page, after a while it will stop responding to new reactions, and you will have to request inventory with the command again.
 
- **фича от 11.06.2021**
-- При получении одной и той же карты каждый 3й раз, участнику сервера дается возможность сразу же попытаться выбить еще одну карту.
-- Теперь, когда человек будет использовать команду для получения карты, но 24 часа с момента прошлого получения еще не прошли, бот покажет через сколько времни выдача карты будет доступна.
+**feature from 11.06.2021**
+- When receiving the same card every 3rd time, the server participant is given the opportunity to immediately try to knock out another card.
+- Now, when a person uses the command to receive a card, 24 hours have not passed since the last receipt, the bot will show how long the card will be available.
 
-## Настройка проекта
-1. **Склонируйте проект.**
+## Project Setup
+1. **Clone the project.**
 
-2. **Убедитесь, что у вас установлено:**
- - ![Node.js](https://nodejs.org/en/) 10.0.0 или выше.
+2. **Make sure that you have installed:**
+ - ![Node.js](https://nodejs.org/en/) 10.0.0 or higher.
 
-3. **Создайте конфигигурационный файл и занесите в него необходимую информацию.**
+3. **Create a configuration file and enter the necessary information into it.**
 
-### Создание конфига
-В корне проекта создайте конфигурационный файл **.env**
-Пример файла .env :
+### Creating a config
+In the root of the project, create a configuration file **.env**
+Example of the .env file :
 ```
-TOKEN = "токен вашего бота"
+TOKEN = "your bot token"
 PREFIX = '!' 
 PAGE_SIZE = 7
 INVENTORY_TIME = 60000
@@ -190,63 +190,65 @@ RESET_LOCAL_TIME = ""
 LOCALES = "en"
 ```
 
-**PAGE_SIZE** - количество элементов, которые будут умещаться на одной странице инвентаря при показе
+**PAGE_SIZE** - the number of items that will fit on one inventory page when displayed
 
-**INVENTORY_TIME** - время бездействия инвентаря, после которого бот перестает листать страницы, указывается в миллисекундах
+**INVENTORY_TIME** - the idle time of the inventory, after which the bot stops flipping pages, is indicated in milliseconds
 
-**INVENTORY_PUBLIC_ACCESS** - доступ вызова инвентаря другого пользователя **1 - можете использовать покажимне @UserMention, 0 - другие пользователи могут только сами демонстрировать свой инвентарь в чате**
+**INVENTORY_PUBLIC_ACCESS** - access to another user's inventory **1 - you can use show @UserMention, 0 - other users can only show their inventory themselves in the chat**
 
-**RESET_LOCAL_TIME** - локальное время сервера во время которого происходит сброс таймера для **дайкарту** у всех пользователей одновременно. Формат значения поля: **"чч:мм:сс"**, например **RESET_LOCAL_TIME** = "16:45:00".  Если **""** - то при использовании **дайкарту** бот будет устанавливать время сброса каждому пользователю индивидуально.
+**RESET_LOCAL_TIME** - the local time of the server during which the timer is reset for **drop** to all users at the same time. Field value format: **"hh:mm:ss"**, for example **RESET_LOCAL_TIME** = "16:45:00". If **""** - then when using **drop**, the bot will set the reset time for each user individually.
 
-**RARE_CLASS_NUMBER** - количество классов редкости/ценности
+**LOCALES** - setting up the localization of the bot en - English, ru - Russian
 
-**CLASS_SYMBOL_FILL** - Discord emoji для заполнения шкалы редкости/ценности
+**RARE_CLASS_NUMBER** - number of rarity/value classes
 
-**CLASS_SYMBOL_OF_VOID** - Discord emoji для заполнения пустоты шкалы редкости/ценности
+**CLASS_SYMBOL_FILL** - Discord emoji to fill in the rarity/value scale
 
-**LOCALES** - настройка локализации бота en - английский, ru - русский язык
+**CLASS_SYMBOL_OF_VOID** - Discord emoji to fill the void of the rarity/value scale
 
-Иллюстрация ниже чтобы понять суть 3х последних параметров:
-<br />
+
+
+The illustration below is to understand the essence of the last 3 parameters:
+
 ![](https://media.discordapp.net/attachments/852679774128439386/891748889118511134/env_decr.png)
 
-4. **Добавьте необходимый контент для вашего сервера.**
+4. **Add the necessary content for your server.**
 
-### Подготовка контента
-Откройте файл /storage/db.json
+### Content preparation
+Open /storage/db.json
 ```
 {
-	"users": [], // Ссодержит данные участников сервера и их инвентарь 
-	"cards": [], // Содержит данные о картах, которые могут выпасть на сервере
-	"codes": [], // Содержит информацию о ивентовых кодах для пользователей
+	"users": [], // Contains data of server participants and their inventory 
+	"cards": [], // Contains data about cards that may fall out on the server
+	"codes": [], // Contains information about event codes for users
 }
 ```
 
-Данные о пользователях сервера **будут автоматически добавляться** по мере использования команд бота.
-Данные о картах вам **придется заполнить самостоятельно**. 
-Пример добавления карты в **db.json**
+Data about server users ** will be automatically added** as the bot commands are used.
+You ** can fill in the card data by yourself**.
+Example of adding a map to **db.json**
 ```
 cards: [
     {
-        "name": "test_card", // Название карты
-        "class": 1, // ценность карты, определяется от 1 до RARE_CLASS_NUMBER включительно
-        "active": true, // Флаг, определяющий, может ли катра вывпасть участникам сервера
-        "url": "url_string.png"  // Ссылка на изображение карты
+        "name": "test_card", // Name of the card
+        "class": 1, // the value of the card is determined from 1 to RARE_CLASS_NUMBER inclusive
+        "active": true, // Flag that determines whether the card can fall to the server participants
+        "url": "url_string.png"  // Link to the card image
     }, 
 ]
 ```
 
-Если вы только склонировали проект, то вы можете обнаружить что в **db.json** уже есть информация о тестовых картах с редкостью от 1 до 6 где карты с **class от 1 до 5 - стандартные** и та, что с **class 6 - нестандартная**(Что значит ее ценность не будет отображаться при помощи **CLASS_SYMBOL_FILL** и **CLASS_SYMBOL_OF_VOID**, учтите это, если же вы хотите как то отметить ее ценность символами/эмодзи, можете прописать их в поле названия карты, как в **db.json** репозитория).  
+If you have only cloned the project, then you may find that in **db.json** already has information about test cards with a rarity from 1 to 6 where cards with **class from 1 to 5 are standard** and the one with **class 6 is non-standard** (Which means its value will not be displayed using **CLASS_SYMBOL_FILL** and **CLASS_SYMBOL_OF_VOID**, keep this in mind, if you want to somehow mark its value with symbols/emojis, you can write them in the card name field, as in **db.json** of the repository).  
 
-5. **Скачайте необходимые модули для работы проекта.**
+5. **Download the necessary modules for the project to work.**
 
-### Подгрузка зависимостей
-Откройте терминал в корне проекта, далее пропишите следующие команды:
+### Download dependencies
+Open the terminal in the root of the project, then write the following commands:
 ```
 npm i 
 ```
-6. **После всех успешно проделанных шагов, вы можете запустить бота, прописав команду в терминале.**
-### Запуск проекта
+6. **After all the steps have been successfully completed, you can start the bot by writing a command in the terminal.**
+### Project launch
 ```
 npm start 
 ```
