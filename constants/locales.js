@@ -239,8 +239,8 @@ const LOCALES = {
         en: `Specify the user using @`,
     },
     ResetDrop__MessageEmbed__to_all_users: {
-        ru: `всех пользователей!`,
-        en: `all users!`,
+        ru: ` всех пользователей!`,
+        en: ` all users!`,
     },
     ResetDrop__MessageEmbed__updated_drops: {
         ru: `Вами были обновлены крутки для`,
