@@ -28,7 +28,7 @@ function DeleteCard (message, args, client) {
 	let obj = ReadDBFile();
     if (args.length == 1) { //strong delete
         let deleteCardName = args[0];
-        deleteCardName = deleteCardName.replace(/;/g, ' '); // ";" should use as ' ' if you want to add space in cardname
+        deleteCardName = deleteCardName.replace(CONSTANTS.SPACE_REGEX, ' '); // "SPACE_SYMBOL" should use as ' ' if you want to add space in cardname
         if (!FindCardByName(message, deleteCardName, true)) {message.reply(`${LOCALES.DeleteCard__MessageEmbed__card_not_found[CONSTANTS.LANG]}`); return; }
         const DeleteCard = obj.cards.find(card => { if(card.name == deleteCardName) return card});// get reference of object to edit and save to DB after all
         // delete card in card pool

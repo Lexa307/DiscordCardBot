@@ -84,7 +84,7 @@ This command requires 1 mandatory argument - **the full name of the card.**
 ### addcard CardName ClassNumber [ImageSourceLink]
 The server admin can create a new card that is automatically placed in the card drop pool.
 Command arguments:
- - CardNameCardName **name of the new card**, (required) - must not match the existing name of the card in the database, use the ";" symbol to add a space
+ - CardNameCardName **name of the new card**, (required) - must not match the existing name of the card in the database, use the **SPACE_SYMBOL** symbol to add a space
  - ClassNumber **card class**, (required) it should be a number from 1 to 5 - standard classes of cards, other values will make a card of a non-standard class
  - ImageSourceLink **link to the picture .png .jpg .gif**, a mandatory argument that can be omitted provided that a picture is attached to the message of this command in the attachment.
 
@@ -93,7 +93,7 @@ Command arguments:
  ### editcard CardName editCardName editClassNumber [editImageSourceLink]
 A command accessible only to the administrator, created to change the data of existing maps, requires the following arguments:
  - CardName (required) - full name of the card to be changed
- - editCardName (required) - the new name of the card, if you do not want to change, insert the one that is (a reminder to use ";" instead of a space)
+ - editCardName (required) - the new name of the card, if you do not want to change, insert the one that is (a reminder to use **SPACE_SYMBOL** instead of a space)
  - editClassNumber - (required) new card class, must be a number
  - editImageSourceLink (required) - new image (link to image) to display
 
@@ -105,6 +105,14 @@ Resets the cooldown of the **drop** command for all users or only the specified 
 ![](https://media.discordapp.net/attachments/852679774128439386/1008515882055651358/unknown.png)
 
 ## News
+ **a small update from 09.25.2022**
+ - Added option for replacing ' ' in commands: **SPACE_SYMBOL** , before it was ';' by default
+ For example to add Card with name that contains ' ' in name you can use your own different symbol(s) (not allowed symbols that using as args separator):
+ in .env file **SPACE_SYMBOL = "__"**
+ ```
+ !addcard Hello__world 2 https://c.tenor.com/mGgWY8RkgYMAAAAC/hello-world.gif // cardname in DB: "Hello world"
+ ```
+
  **Major update from 08.11.2022**
  - Added administration of cards using commands (add, change and delete)
  - Added the ability to select a language and add your own localization, now the bot supports Russian and English.
@@ -187,6 +195,7 @@ RARE_CLASS_NUMBER = 5
 CLASS_SYMBOL_FILL = ":star:"
 CLASS_SYMBOL_OF_VOID = ":small_orange_diamond:"
 RESET_LOCAL_TIME = ""
+SPACE_SYMBOL = "__"
 LOCALES = "en"
 ```
 
@@ -199,6 +208,8 @@ LOCALES = "en"
 **RESET_LOCAL_TIME** - the local time of the server during which the timer is reset for **drop** to all users at the same time. Field value format: **"hh:mm:ss"**, for example **RESET_LOCAL_TIME** = "16:45:00". If **""** - then when using **drop**, the bot will set the reset time for each user individually.
 
 **LOCALES** - setting up the localization of the bot en - English, ru - Russian
+
+**SPACE_SYMBOL** - Symbol(s) should use instead of SPACE in commands, because ' ' by default is using for splitting arguments
 
 **RARE_CLASS_NUMBER** - number of rarity/value classes
 

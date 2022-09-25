@@ -41,7 +41,7 @@ function AddNewCard (message, args, client) {
     if (args.length >= 2) {
         let [newCardName, classNumber, imgSrc = undefined] = args;
         // stage 1 check cardname if exsists
-        newCardName = newCardName.replace(/;/g, ' '); // ";" should use as ' ' if you want to add space in cardname
+        newCardName = newCardName.replace(CONSTANTS.SPACE_REGEX, ' '); // "SPACE_SYMBOL" should use as ' ' if you want to add space in cardname
         if (FindCardByName(message, newCardName, true) != 0) {
             message.reply(`${LOCALES.AddNewCard__MessageEmbed__name_already_exists[CONSTANTS.LANG]}`);
             return;

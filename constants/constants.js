@@ -10,6 +10,7 @@ const INVENTORY_PUBLIC_ACCESS = parseInt(process.env.INVENTORY_PUBLIC_ACCESS);
 const MOD_ROLE_NAME = process.env.MOD_ROLE_NAME;
 const RESET_LOCAL_TIME = (process.env.RESET_LOCAL_TIME).split(':');
 const LANG = process.env.LOCALES;
+const SPACE_REGEX = new RegExp(`/${process.env.SPACE_SYMBOL}/g`);
 module.exports = {
     INVENTORY_TIME,
     RESET_LOCAL_TIME,
@@ -20,5 +21,6 @@ module.exports = {
     LANG,
     PREFIX,
     INVENTORY_PUBLIC_ACCESS,
+    SPACE_REGEX,
     TOKEN
 }

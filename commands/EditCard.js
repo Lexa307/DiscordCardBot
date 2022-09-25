@@ -35,11 +35,11 @@ function EditCard (message, args, client) {
     //TODO edit card by 1 argument (cardname)
     if (args.length >= 3) { //strong edit
         let [CardName, editCardName, editClassNumber, imgSrc = undefined] = args;
-        CardName = CardName.replace(/;/g, ' '); // ";" should use as ' ' if you want to add space in cardname
+        CardName = CardName.replace(CONSTANTS.SPACE_REGEX, ' '); // "SPACE_SYMBOL" should use as ' ' if you want to add space in cardname
         const OldCard = FindCardByName(message, CardName, true);
         const EditCard = obj.cards.find(card => { if(card.name == OldCard.name) return card});// get reference of object to edit and save to DB after all
         // stage 1 check cardname if exsists
-        editCardName = editCardName.replace(/;/g, ' '); // ";" should use as ' ' if you want to add space in cardname
+        editCardName = editCardName.replace(CONSTANTS.SPACE_REGEX, ' '); // ";" should use as ' ' if you want to add space in cardname
 
         // stage 2 check editClassNumber is it int number?
         if (!typeof(parseInt(editClassNumber, 10)) == 'number') {
