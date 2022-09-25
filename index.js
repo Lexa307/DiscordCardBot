@@ -40,9 +40,10 @@ fs.readdir(`${__dirname}/commands`, (err, file) => {
 
 
 Client.on('message', (message) => {
-	const args = message.content.slice(CONSTANTS.PREFIX.length).trim().split(/ +/g);
+    if (! message.content.startsWith(CONSTANTS.PREFIX)) return ;
+	const args = message.content.slice(CONSTANTS.PREFIX.length).split(/ +/g);
 	const command = args.shift().toLowerCase();
-	const cmd = BOT_COMMANDS.find((botcommand) => (botcommand.name === command));
+	const cmd = BOT_COMMANDS.find( botcommand => botcommand.name == command );
 	if (cmd) cmd.func(message, args, Client);
 });
 Client.login(CONSTANTS.TOKEN);
