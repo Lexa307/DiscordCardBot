@@ -1,6 +1,6 @@
 const UserCheck = require("../utils/UserCheck.js");
 const ReadDBFile = require("../utils/ReadDBFile.js");
-const Discord = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const CONSTANTS = require ("../constants/constants.js");
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
 const GetClassString = require("../utils/GetClassString.js");
@@ -23,7 +23,7 @@ const ShowProfile = (message, args, client) => {
     }
     UserCheck(member);
     let obj = ReadDBFile();
-    let embed = new Discord.MessageEmbed();
+    let embed = new EmbedBuilder();
     client.users.fetch(member).then(user => {
         embed.setThumbnail(user.displayAvatarURL());
         embed.setTitle(`${LOCALES.Profile__MessageEmbed__user_profile[CONSTANTS.LANG]} ${user.username}`); // Профиль участника
@@ -31,33 +31,33 @@ const ShowProfile = (message, args, client) => {
         let totalCardCount = userCards.reduce((sum, current) => {
             return sum += current.count;
         }, 0);
-        embed.addField(`**${LOCALES.Profile__MessageEmbed__cards_fallen_total[CONSTANTS.LANG]} ${totalCardCount}**`, `** **`); // Сколько всего карт выпало :
+        embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__cards_fallen_total[CONSTANTS.LANG]} ${totalCardCount}**`, value: `** **`}); // Сколько всего карт выпало :
 
         if (userCards.length > 0) {
-            embed.addField(`**${LOCALES.Profile__MessageEmbed__statistics_of_dropped_cards[CONSTANTS.LANG]}**`, `** **`); // Статистика выпавших карт
+            embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__statistics_of_dropped_cards[CONSTANTS.LANG]}**`, value: `** **`}); // Статистика выпавших карт
             for (let cardClass = 1; cardClass <= CONSTANTS.RARE_CLASS_NUMBER; cardClass++) {
                 let totalClassCount = obj.cards.filter(card => { return card.class == cardClass}).length;
                 let classCount = userCards.filter(card => { return (obj.cards.find(cardDB => { return cardDB.name == card.name}).class == cardClass)}).length;
-                embed.addField(`${GetClassString(cardClass)}:    ${classCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalClassCount} `, `** **`);
+                embed.addFields({name: `${GetClassString(cardClass)}:    ${classCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalClassCount} `, value: `** **`});
             }
             
             let totalNonStandatClassCount = obj.cards.filter((card)=>{ return ((card.class > CONSTANTS.RARE_CLASS_NUMBER) || (card.class <= 0)) }).length;
             if (totalNonStandatClassCount) {
                 // embed.addField(``, `** **`); //  Собрано нестандартных карт :
                 let classNonStandatCount = userCards.filter(card => {cClass = obj.cards.find(cardDB => { return cardDB.name == card.name}).class; return (cClass > CONSTANTS.RARE_CLASS_NUMBER || cClass <=0 )}).length;
-                embed.addField(`**${LOCALES.Profile__MessageEmbed__collected_non_standard_cards[CONSTANTS.LANG]} ${classNonStandatCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalNonStandatClassCount}**`, `** **`);
+                embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__collected_non_standard_cards[CONSTANTS.LANG]} ${classNonStandatCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalNonStandatClassCount}**`, value: `** **`});
             } 
 
             let remainingCards = obj.cards.length - userCards.length;
-            embed.addField(`**${LOCALES.Profile__MessageEmbed__not_been_opened_yet[CONSTANTS.LANG]} ${remainingCards}**`, `** **`); //  Сколько карт еще не открыто :
+            embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__not_been_opened_yet[CONSTANTS.LANG]} ${remainingCards}**`, value: `** **`}); //  Сколько карт еще не открыто :
             
             let sortedCardArray = userCards.sort((a,b) => { return a.count - b.count});
             let card = sortedCardArray[sortedCardArray.length -1];
             let cardClass = obj.cards.find(cardDB => { return cardDB.name == card.name}).class;
             let cardClassString = GetClassString(cardClass);
-            embed.addField(`**${LOCALES.Profile__MessageEmbed__fell_out_the_most_times[CONSTANTS.LANG]} **`, `${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url }) X${card.count} `); //  Карта, которая больше всего раз выпала :
+            embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__fell_out_the_most_times[CONSTANTS.LANG]} **`, value: `${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url }) X${card.count} `}); //  Карта, которая больше всего раз выпала :
             embed.setImage(card.url);
-            message.reply(embed);
+            message.reply({embeds: [embed]});
         } else {
             message.reply(`**${user.username} ${LOCALES.Profile__MessageEmbed__no_cards_in_the_inventory[CONSTANTS.LANG]}**`);
         }

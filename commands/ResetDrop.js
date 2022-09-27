@@ -3,13 +3,13 @@ const ReadDBFile = require("../utils/ReadDBFile.js");
 const CONSTANTS = require ("../constants/constants.js");
 const GetUserFromMention = require("../utils/GetUserFromMention.js");
 const SaveObjToDB = require("../utils/SaveObjToDB.js");
-const Discord = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const LOCALES = require('../constants/locales.js');
 
 function ResetDrop (message, args, client) {
     UserCheck(message.author.id);
     if (!message.guild) return; //if message is not DM
-    if (!message.member.hasPermission('ADMINISTRATOR')) return; //this command can use admin only
+    if (!message.member.permissions.has('ADMINISTRATOR')) return; //this command can use admin only
     let member, messageEnding;
     if (args[0]) {
         member = GetUserFromMention(args[0]);
@@ -25,7 +25,7 @@ function ResetDrop (message, args, client) {
         messageEnding = `${LOCALES.ResetDrop__MessageEmbed__to_all_users[CONSTANTS.LANG]}`;
     }
     UserCheck(member);
-    const memeGifs = [ 
+    const memeGifs = [ // TODO: comment this at master
         "https://c.tenor.com/hJR5o7BTK7MAAAAC/serial-experiments-lain-lain.gif",
         "https://c.tenor.com/PaeXns-85fQAAAAC/scp.gif",
         "https://c.tenor.com/33anXDfc5mUAAAAd/coconut-nekopara.gif",
@@ -51,12 +51,12 @@ function ResetDrop (message, args, client) {
     }
     SaveObjToDB(obj);
     client.users.fetch(message.author.id).then(user => {
-		let embed = new Discord.MessageEmbed();
+		let embed = new EmbedBuilder();
 		embed.setColor("#d1b91f");
-		embed.setAuthor(user.username, user.displayAvatarURL(), user.url);
+		embed.setAuthor({name: user.username, iconURL: user.displayAvatarURL(), url: user.url});
 		embed.setTitle(`${LOCALES.ResetDrop__MessageEmbed__updated_drops[CONSTANTS.LANG]}${messageEnding}`);
         embed.setImage(memeGifs[Math.floor(Math.random() * memeGifs.length)]); // So i decided to add some funny/congrats gifs that will be shown in chat, be free to add something special for your users or to disable it just // this string
-		message.reply(embed);
+		message.reply({embeds: [embed]});
 	})
 }
 

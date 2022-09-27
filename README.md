@@ -178,7 +178,7 @@ after entering the command about the show inventory request, the bot shows you t
 1. **Clone the project.**
 
 2. **Make sure that you have installed:**
- - ![Node.js](https://nodejs.org/en/) 10.0.0 or higher.
+ - ![Node.js](https://nodejs.org/en/) 16.17.1 or higher.
 
 3. **Create a configuration file and enter the necessary information into it.**
 

@@ -5,7 +5,7 @@ const FindCardByName = require('../utils/FindCardByName.js');
 const GetClassString = require("../utils/GetClassString.js");
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
 const SaveObjToDB = require("../utils/SaveObjToDB.js");
-const Discord = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const LOCALES = require('../constants/locales.js');
 
 function attachIsImage(msgAttach) {
@@ -18,19 +18,19 @@ function showNewCard(message, card, obj, client) {
 	let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
 	let cardClassString = GetClassString(cardClassNumber);
 	client.users.fetch(message.author.id).then(user => {
-		let embed = new Discord.MessageEmbed();
+		let embed = new EmbedBuilder();
 		embed.setColor("#d1b91f");
-		embed.setAuthor(user.username, user.displayAvatarURL(), user.url);
+		embed.setAuthor({name: user.username, iconURL: user.displayAvatarURL(), url: user.url});
 		embed.setTitle(`${LOCALES.EditCard__MessageEmbed__edited_card_with_name[CONSTANTS.LANG]}`);
 		embed.setDescription(`**${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url})**`);
 		embed.setImage(`${card.url}`);
-		message.reply(embed);
+		message.reply({embeds: [embed]});
 	});
 }
 
 function EditCard (message, args, client) {
     UserCheck(message.author.id);
-    if (!message.member.hasPermission('ADMINISTRATOR')) return; //this command can use admin only
+    if (!message.member.permissions.has('ADMINISTRATOR')) return; //this command can use admin only
 	let obj = ReadDBFile();
     //TODO edit card by 1 argument (cardname)
     if (args.length >= 3) { //strong edit

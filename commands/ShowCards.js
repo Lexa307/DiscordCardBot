@@ -2,7 +2,7 @@ const UserCheck = require("../utils/UserCheck.js");
 const ReadDBFile = require("../utils/ReadDBFile.js");
 const InventoryMessages = [];
 const CONSTANTS = require ("../constants/constants.js");
-const Discord = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
 const GetClassString = require("../utils/GetClassString.js");
 const GetUserFromMention = require("../utils/GetUserFromMention.js");
@@ -17,17 +17,24 @@ function GetPageString(authorId, index, memberIsAuthor) {
     let start = CONSTANTS.PAGE_SIZE * (index);
     let end = CONSTANTS.PAGE_SIZE * (index + 1);
     let obj = ReadDBFile();
-    let embed = new Discord.MessageEmbed();
+    let embed = new EmbedBuilder();
     
     embed.setColor("#0f3961");
-    embed.addField(`** **`, cardString);
+    embed.addFields({name: `** **`, value: cardString});
     for(let card of userCards) {
         let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
         let cardClassString = GetClassString(cardClassNumber);
         strings.push({'cardClassString': cardClassString, name: card.name, count: card.count, url: card.url});
     }
-    strings.slice(start, end).forEach(card => {embed.addField(`--------------------------------------`, `${(card.cardClassString) ? card.cardClassString : ReplaceEmojisFromNameToClass(card) }[${card.name}](${card.url}) X${card.count}`)});
-    embed.addField(`** ${LOCALES.ShowCards__MessageEmbed__page[CONSTANTS.LANG]} ${index + 1 } / ${pageCount}**`, `** **`)
+    strings.slice(start, end).forEach(card => {
+        embed.addFields(
+            {
+                name: `--------------------------------------`, 
+                value: `${(card.cardClassString) ? card.cardClassString : ReplaceEmojisFromNameToClass(card) }[${card.name}](${card.url}) X${card.count}`
+            }
+        )
+    });
+    embed.addFields({name: `** ${LOCALES.ShowCards__MessageEmbed__page[CONSTANTS.LANG]} ${index + 1 } / ${pageCount}**`, value: `** **`})
     return embed;
 }
 
@@ -35,8 +42,7 @@ function AwaitReactions(message, authorMessage, pageIndex, pageCount) { // messa
     const filter = (reaction, user) => {
         return ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === authorMessage.author.id;
     };
-
-    message.awaitReactions(filter, {max: 1, time: CONSTANTS.INVENTORY_TIME })
+    message.awaitReactions({filter, max: 1, time: CONSTANTS.INVENTORY_TIME, errors: ['time'] })
     .then(collected => {
         const reaction = collected.first();
         if (reaction.emoji.name === '⬅️') {
@@ -64,9 +70,9 @@ async function ChangeInventoryPage(message, pageDirrection) {
     let authorIsMember = (messageState.authorMessage.author.id == messageState.inventoryMember)
     let lastPage = GetPageString(messageState.inventoryMember, pageIndex, authorIsMember);
     let embedAuthor = messageState.authorMessage.author;
-    lastPage.setAuthor(embedAuthor.username, embedAuthor.displayAvatarURL(), embedAuthor.url);
+    lastPage.setAuthor({name: embedAuthor.username, iconURL: embedAuthor.displayAvatarURL(), url: embedAuthor.url});
     messageState.index = pageIndex;
-    message.edit(lastPage);
+    message.edit({embeds: [lastPage]});
     let pageCount = Math.ceil(GetUserCards(messageState.inventoryMember).length / CONSTANTS.PAGE_SIZE);
     if(pageIndex > 0 ) await message.react('⬅️');
     if(pageIndex < pageCount - 1) await message.react('➡️');
@@ -104,9 +110,9 @@ const ShowCard = async (message, args, client) => {
     let pageCount = Math.floor(userCards.length / CONSTANTS.PAGE_SIZE);
     let pageIndex = pageCount;
     let lastPage = GetPageString(member, pageIndex, authorIsMember);
-    lastPage.setAuthor(message.author.username, message.author.displayAvatarURL(), message.author.url)
+    lastPage.setAuthor({name: message.author.username, iconURL: message.author.displayAvatarURL(), url: message.author.url})
     
-    message.reply(lastPage).then( mes => {
+    message.reply({embeds: [lastPage]}).then( mes => {
         InventoryMessages.push({message: mes, index: pageIndex, authorMessage: message, inventoryMember: member});
         mes.react('⬅️');
         AwaitReactions(mes, message, pageIndex, pageCount);

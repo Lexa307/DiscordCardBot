@@ -2,7 +2,7 @@ const UserCheck = require("../utils/UserCheck.js");
 const ReadDBFile = require("../utils/ReadDBFile.js");
 const CONSTANTS = require ("../constants/constants.js");
 const SaveObjToDB = require("../utils/SaveObjToDB.js");
-const Discord = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const GetClassString = require("../utils/GetClassString.js");
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
 const configLocalTime = CONSTANTS.RESET_LOCAL_TIME;
@@ -21,16 +21,16 @@ function showGivenCard(message, card, reRoll = undefined, obj, userData, client)
 	let cardClassString = GetClassString(cardClassNumber);
 	let sameCardCount = userData.cards.find(item => { if (item.name == card.name) return item }).count;
 	client.users.fetch(message.author.id).then(user => {
-		let embed = new Discord.MessageEmbed();
+		let embed = new EmbedBuilder();
 		embed.setColor("#d1b91f");
-		embed.setAuthor(user.username, user.displayAvatarURL(), user.url);
+		embed.setAuthor({name: user.username, iconURL: user.displayAvatarURL(), url: user.url});
 		embed.setTitle(LOCALES.DropCard__MessageEmbed__got_card_with_name[CONSTANTS.LANG]); // Вам выпала карта с названием:
 		embed.setDescription(`**${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url})**`);
 		embed.setImage(`${card.url}`);
-		embed.setFooter(`${LOCALES.DropCard__MessageEmbed__cards_you_have_now[CONSTANTS.LANG]} ${sameCardCount}`); // Таких карт у вас сейчас: X
+		embed.setFooter({text: `${LOCALES.DropCard__MessageEmbed__cards_you_have_now[CONSTANTS.LANG]} ${sameCardCount}`}); // Таких карт у вас сейчас: X
 
-		if (reRoll) embed.addField(`${LOCALES.DropCard__MessageEmbed__3_cards_in_a_row1[CONSTANTS.LANG]} `, `${LOCALES.DropCard__MessageEmbed__3_cards_in_a_row2[CONSTANTS.LANG]}`);
-		message.reply(embed);
+		if (reRoll) embed.addFields({name: `${LOCALES.DropCard__MessageEmbed__3_cards_in_a_row1[CONSTANTS.LANG]} `, value: `${LOCALES.DropCard__MessageEmbed__3_cards_in_a_row2[CONSTANTS.LANG]}`, inline: false});
+		message.reply({embeds: [embed]});
 	})
 }
 

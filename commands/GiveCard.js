@@ -6,14 +6,14 @@ const GetClassString = require("../utils/GetClassString.js");
 const GetUserFromMention = require("../utils/GetUserFromMention.js");
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
 const SaveObjToDB = require("../utils/SaveObjToDB.js");
-const Discord = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const LOCALES = require("../constants/locales.js");
 
 function showGivenCard(message, card, obj, client) {
 	let cardClassNumber = obj.cards.find(cardDB => {return cardDB.name == card.name}).class; 
 	let cardClassString = GetClassString(cardClassNumber);
 	client.users.fetch(message.author.id).then(user => {
-		let embed = new Discord.MessageEmbed();
+		let embed = new EmbedBuilder();
 		embed.setColor("#d1b91f");
 		embed.setAuthor(user.username, user.displayAvatarURL(), user.url);
 		embed.setTitle(`${LOCALES.GiveCard__MessageEmbed__issued_a_card[CONSTANTS.LANG]}`); //Вами была выдана карта с названием: 
@@ -26,7 +26,7 @@ function showGivenCard(message, card, obj, client) {
 function RoleTeter (message, args, client) {
     UserCheck(message.author.id);
     if (!message.guild) return; //if message is not DM
-    if (!message.member.hasPermission('ADMINISTRATOR')) return; //this command can use admin only
+    if (!message.member.permissions.has('ADMINISTRATOR')) return; //this command can use admin only
     let member;
     if (args[0]) {
         member = GetUserFromMention(args[0]);
