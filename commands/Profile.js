@@ -1,74 +1,170 @@
+// You might need to adjust the paths to your utility files and constants
 const UserCheck = require("../utils/UserCheck.js");
 const ReadDBFile = require("../utils/ReadDBFile.js");
-const {EmbedBuilder} = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const CONSTANTS = require ("../constants/constants.js");
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
 const GetClassString = require("../utils/GetClassString.js");
-const GetUserFromMention = require("../utils/GetUserFromMention.js");
+// Removed GetUserFromMention as message.mentions is preferred in modern DJS
 const LOCALES = require("../constants/locales.js");
 
+// --- Utility Functions (Keep them or move them) ---
+
+/**
+ * Reads the DB and finds a user's cards based on userId.
+ * Note: This function re-reads the DB every call, which might be inefficient.
+ */
 function GetUserCards(userId) {
-    let obj = ReadDBFile();
-    return obj.users.find((user) => { if (userId == user.id) return user.cards}).cards;
+    const obj = ReadDBFile();
+    // Use find for efficiency, then optional chaining for safety
+    return obj.users.find(user => userId === user.id)?.cards || []; 
 }
 
 function isUrlMp4(url) {
-    return url.indexOf("mp4", url.length - 3) !== -1;
+    if (!url) return false;
+    // Checks if the URL ends with '.mp4'
+    return url.toLowerCase().endsWith(".mp4");
 }
 
-const ShowProfile = (message, args, client) => {
-    UserCheck(message.author.id);
-    let member;
+// --- Main Command Function (using async/await) ---
+
+const ShowProfile = async (message, args, client) => {
+    // 1. Determine target user ID
+    let targetUser = message.author;
+    let memberId;
+
+    // Check if a mention was provided in args[0]
     if (args[0]) {
-        member = GetUserFromMention(args[0]);
-        if (!member) message.channel.send(`${LOCALES.Profile__MessageEmbed__wrong_user[CONSTANTS.LANG]}`); // Для просмотра профиля учатника необходимо упомянуть только его
-    } else {
-        member = message.author.id;
-    }
-    UserCheck(member);
-    let obj = ReadDBFile();
-    let embed = new EmbedBuilder();
-    client.users.fetch(member).then(user => {
-        embed.setThumbnail(user.displayAvatarURL());
-        embed.setTitle(`${LOCALES.Profile__MessageEmbed__user_profile[CONSTANTS.LANG]} ${user.username}`); // Профиль участника
-        let userCards = GetUserCards(member);
-        let totalCardCount = userCards.reduce((sum, current) => {
-            return sum += current.count;
-        }, 0);
-        embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__cards_fallen_total[CONSTANTS.LANG]} ${totalCardCount}**`, value: `** **`}); // Сколько всего карт выпало :
-
-        if (userCards.length > 0) {
-            embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__statistics_of_dropped_cards[CONSTANTS.LANG]}**`, value: `** **`}); // Статистика выпавших карт
-            for (let cardClass = 1; cardClass <= CONSTANTS.RARE_CLASS_NUMBER; cardClass++) {
-                let totalClassCount = obj.cards.filter(card => { return card.class == cardClass}).length;
-                let classCount = userCards.filter(card => { return (obj.cards.find(cardDB => { return cardDB.name == card.name}).class == cardClass)}).length;
-                embed.addFields({name: `${GetClassString(cardClass)}:    ${classCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalClassCount} `, value: `** **`});
-            }
-            
-            let totalNonStandatClassCount = obj.cards.filter((card)=>{ return ((card.class > CONSTANTS.RARE_CLASS_NUMBER) || (card.class <= 0)) }).length;
-            if (totalNonStandatClassCount) {
-                // embed.addField(``, `** **`); //  Собрано нестандартных карт :
-                let classNonStandatCount = userCards.filter(card => {cClass = obj.cards.find(cardDB => { return cardDB.name == card.name}).class; return (cClass > CONSTANTS.RARE_CLASS_NUMBER || cClass <=0 )}).length;
-                embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__collected_non_standard_cards[CONSTANTS.LANG]} ${classNonStandatCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalNonStandatClassCount}**`, value: `** **`});
-            } 
-
-            let remainingCards = obj.cards.length - userCards.length;
-            embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__not_been_opened_yet[CONSTANTS.LANG]} ${remainingCards}**`, value: `** **`}); //  Сколько карт еще не открыто :
-            
-            let sortedCardArray = userCards.sort((a,b) => { return a.count - b.count});
-            let card = sortedCardArray[sortedCardArray.length -1];
-            let cardClass = obj.cards.find(cardDB => { return cardDB.name == card.name}).class;
-            let cardClassString = GetClassString(cardClass);
-            embed.addFields({name: `**${LOCALES.Profile__MessageEmbed__fell_out_the_most_times[CONSTANTS.LANG]} **`, value: `${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url }) X${card.count} `}); //  Карта, которая больше всего раз выпала :
-            embed.setImage(card.url);
-            message.reply({embeds: [embed]});
-            if (isUrlMp4(card.url)) {
-                message.reply(card.url);
-            }
+        // Use mentions collection for a more reliable check
+        const mentionedUser = message.mentions.users.first();
+        if (mentionedUser) {
+            targetUser = mentionedUser;
         } else {
-            message.reply(`**${user.username} ${LOCALES.Profile__MessageEmbed__no_cards_in_the_inventory[CONSTANTS.LANG]}**`);
+            // Handle error if argument is present but not a valid mention
+            // Note: Your old logic assumed GetUserFromMention handled ID lookup or error
+            // For simplicity with mentions, we stick to the error message.
+            message.channel.send(`${LOCALES.Profile__MessageEmbed__wrong_user[CONSTANTS.LANG]}`);
+            return;
         }
-    })
+    }
+    
+    memberId = targetUser.id;
+
+    // 2. Perform initial checks and read data
+    UserCheck(message.author.id); // Check the message author
+    UserCheck(memberId);         // Check the target member
+    
+    const dbObj = ReadDBFile();
+    const userCards = GetUserCards(memberId);
+    
+    // 3. Fetch User (needed for avatar/username, though we have targetUser)
+    // Using await for cleaner flow
+    let user;
+    try {
+        // Fetch the user object if it's not already cached (e.g., if targetUser was only an ID)
+        // Since we are using targetUser = message.mentions.users.first() or message.author, this is redundant but kept for robustness.
+        user = await client.users.fetch(memberId);
+    } catch (e) {
+        console.error("Error fetching user:", e);
+        message.channel.send(`${LOCALES.Profile__MessageEmbed__wrong_user[CONSTANTS.LANG]}`);
+        return;
+    }
+
+
+    // 4. Handle Case: No Cards
+    if (userCards.length === 0) {
+        message.reply({ 
+            content: `**${user.username} ${LOCALES.Profile__MessageEmbed__no_cards_in_the_inventory[CONSTANTS.LANG]}**` 
+        });
+        return;
+    }
+    
+    // 5. Build Embed
+    const embed = new EmbedBuilder()
+        .setThumbnail(user.displayAvatarURL())
+        .setTitle(`${LOCALES.Profile__MessageEmbed__user_profile[CONSTANTS.LANG]} ${user.username}`)
+        .setColor(0x0099ff); // Optional: Set a color
+
+    // Total Card Count
+    const totalCardCount = userCards.reduce((sum, current) => sum + current.count, 0);
+    embed.addFields({
+        name: `**${LOCALES.Profile__MessageEmbed__cards_fallen_total[CONSTANTS.LANG]} ${totalCardCount}**`, 
+        value: `** **`
+    });
+
+    // Statistics Header
+    embed.addFields({
+        name: `**${LOCALES.Profile__MessageEmbed__statistics_of_dropped_cards[CONSTANTS.LANG]}**`, 
+        value: `** **`
+    }); 
+
+    // Card Class Statistics Loop
+    for (let cardClass = 1; cardClass <= CONSTANTS.RARE_CLASS_NUMBER; cardClass++) {
+        // Total cards in this class in DB
+        const totalClassCount = dbObj.cards.filter(card => card.class === cardClass).length;
+        
+        // Count of cards from this class collected by the user
+        const classCount = userCards.filter(userCard => { 
+            const dbCard = dbObj.cards.find(cardDB => cardDB.name === userCard.name);
+            return dbCard && dbCard.class === cardClass;
+        }).length;
+        
+        embed.addFields({
+            name: `${GetClassString(cardClass)}: ${classCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalClassCount}`, 
+            value: `** **`
+        });
+    }
+
+    // Non-Standard Cards
+    const totalNonStandatClassCount = dbObj.cards.filter(card => card.class > CONSTANTS.RARE_CLASS_NUMBER || card.class <= 0).length;
+    
+    if (totalNonStandatClassCount) {
+        const classNonStandatCount = userCards.filter(userCard => {
+            const dbCard = dbObj.cards.find(cardDB => cardDB.name === userCard.name);
+            const cClass = dbCard ? dbCard.class : 0; // Default to 0 if not found
+            return (cClass > CONSTANTS.RARE_CLASS_NUMBER || cClass <= 0);
+        }).length;
+        
+        embed.addFields({
+            name: `**${LOCALES.Profile__MessageEmbed__collected_non_standard_cards[CONSTANTS.LANG]} ${classNonStandatCount} ${LOCALES.Profile__MessageEmbed__of[CONSTANTS.LANG]} ${totalNonStandatClassCount}**`, 
+            value: `** **`
+        });
+    } 
+
+    // Remaining Cards
+    const remainingCards = dbObj.cards.length - userCards.length;
+    embed.addFields({
+        name: `**${LOCALES.Profile__MessageEmbed__not_been_opened_yet[CONSTANTS.LANG]} ${remainingCards}**`, 
+        value: `** **`
+    });
+
+    // Most Dropped Card (Highest count)
+    // Sort array by count descending and take the first element
+    const sortedCardArray = [...userCards].sort((a, b) => b.count - a.count); 
+    const mostDroppedCard = sortedCardArray[0]; // Guaranteed to exist because we checked userCards.length > 0
+    
+    // Find the class of the most dropped card
+    const cardDbInfo = dbObj.cards.find(cardDB => cardDB.name === mostDroppedCard.name);
+    const cardClass = cardDbInfo ? cardDbInfo.class : null;
+    const cardClassString = cardClass ? GetClassString(cardClass) : '';
+
+    embed.addFields({
+        name: `**${LOCALES.Profile__MessageEmbed__fell_out_the_most_times[CONSTANTS.LANG]}**`, 
+        // Use a descriptive name if class string is empty
+        value: `${cardClassString || ReplaceEmojisFromNameToClass(mostDroppedCard)} [${mostDroppedCard.name}](${mostDroppedCard.url}) X${mostDroppedCard.count}`
+    });
+    
+    // Set image and send reply
+    embed.setImage(mostDroppedCard.url);
+    
+    // v14 uses message.reply({ embeds: [...] })
+    await message.reply({ embeds: [embed] }); 
+
+    // Send MP4 URL separately if needed, as DJS embeds struggle with MP4 previews
+    if (isUrlMp4(mostDroppedCard.url)) {
+        // Use message.channel.send to send the URL without a reply ping
+        message.channel.send(mostDroppedCard.url);
+    }
 }
 
 module.exports = {

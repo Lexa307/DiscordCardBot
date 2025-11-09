@@ -23,7 +23,7 @@ BOT_COMMANDS.push(
     },
 );
 
-client.on('ready', () => {
+client.on('clientReady', () => {
 	console.log('Ready');
     console.log(client.generateInvite({scopes: ['bot']}))
 });
