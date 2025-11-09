@@ -366,6 +366,16 @@ const LOCALES = {
         en: `have a card in inventory.`,
         jp: `ユーザーはかーどーが有っていません`,
     },
+    ShowCards__MessageEmbed__total: {
+        ru: `Общее количество уникальных карт`,
+        en: `Total unique cards collected`,
+        jp: `収集されたユニークカードの合計`,
+    },
+    ShowCards__MessageEmbed__category: {
+        ru: `Категория`,
+        en: `Category`,
+        jp: `カテゴリ`,
+    },
     ShowCards__EXPORTS__name: {
         ru: `покажимне`,
         en: `show`,
