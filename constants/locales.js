@@ -442,6 +442,31 @@ const LOCALES = {
         en: `Shows the cards that you or @UserMention have in inventory`,
         jp: `あなたまたは@ユーザーのカードを見せます`,
     },
+    ShowCards__BTN_info: {
+        ru: `Нажми на кнопку с названием чтобы просмотреть карточку`,
+        en: `Click a button to view the card`,
+        jp: `ボタンをクリックしてカードを表示してください`,
+    },
+    ShowCards__VideoCardViewer: {
+        ru: `Просмотр видео карточки`,
+        en: `Video Card Viewer`,
+        jp: `ビデオカードビューア`,
+    },
+    ShowCards__VideoCardViewerBelow: {
+        ru: `Видео карточка отобразится сообщением ниже`,
+        en: `The video player is displayed in the message below.`,
+        jp: `ビデオ プレーヤーは以下のメッセージに表示されます。`,
+    },
+    ShowCards__CardView: {
+        ru: `Просмотр карты`,
+        en: `Viewing Card`,
+        jp: `視聴カード`,
+    },
+    ShowCards__PermissionMessage: {
+        ru: `У вас нет прав нажимать эту кнопку`,
+        en: `You do not have permission to use this button.`,
+        jp: `このボタンを使用する権限がありません。`,
+    },
 
     Undiscovered__MessageEmbed__no_cards_in_base: {
         ru: `Сначала добавьте карты в базу, перед тем как заставлять меня считать то, чего нет!`,

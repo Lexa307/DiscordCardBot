@@ -17,7 +17,7 @@ const LOCALES = require("../constants/locales.js");
 function GetUserCards(userId) {
     const obj = ReadDBFile();
     // Use find for efficiency, then optional chaining for safety
-    return obj.users.find(user => userId === user.id)?.cards || []; 
+    return obj.users.find(user => userId == user.id)?.cards || []; 
 }
 
 function isUrlMp4(url) {
@@ -72,7 +72,7 @@ const ShowProfile = async (message, args, client) => {
 
 
     // 4. Handle Case: No Cards
-    if (userCards.length === 0) {
+    if (userCards.length == 0) {
         message.reply({ 
             content: `**${user.username} ${LOCALES.Profile__MessageEmbed__no_cards_in_the_inventory[CONSTANTS.LANG]}**` 
         });
@@ -101,12 +101,12 @@ const ShowProfile = async (message, args, client) => {
     // Card Class Statistics Loop
     for (let cardClass = 1; cardClass <= CONSTANTS.RARE_CLASS_NUMBER; cardClass++) {
         // Total cards in this class in DB
-        const totalClassCount = dbObj.cards.filter(card => card.class === cardClass).length;
+        const totalClassCount = dbObj.cards.filter(card => card.class == cardClass).length;
         
         // Count of cards from this class collected by the user
         const classCount = userCards.filter(userCard => { 
-            const dbCard = dbObj.cards.find(cardDB => cardDB.name === userCard.name);
-            return dbCard && dbCard.class === cardClass;
+            const dbCard = dbObj.cards.find(cardDB => cardDB.name == userCard.name);
+            return dbCard && dbCard.class == cardClass;
         }).length;
         
         embed.addFields({
@@ -120,7 +120,7 @@ const ShowProfile = async (message, args, client) => {
     
     if (totalNonStandatClassCount) {
         const classNonStandatCount = userCards.filter(userCard => {
-            const dbCard = dbObj.cards.find(cardDB => cardDB.name === userCard.name);
+            const dbCard = dbObj.cards.find(cardDB => cardDB.name == userCard.name);
             const cClass = dbCard ? dbCard.class : 0; // Default to 0 if not found
             return (cClass > CONSTANTS.RARE_CLASS_NUMBER || cClass <= 0);
         }).length;
@@ -144,7 +144,7 @@ const ShowProfile = async (message, args, client) => {
     const mostDroppedCard = sortedCardArray[0]; // Guaranteed to exist because we checked userCards.length > 0
     
     // Find the class of the most dropped card
-    const cardDbInfo = dbObj.cards.find(cardDB => cardDB.name === mostDroppedCard.name);
+    const cardDbInfo = dbObj.cards.find(cardDB => cardDB.name == mostDroppedCard.name);
     const cardClass = cardDbInfo ? cardDbInfo.class : null;
     const cardClassString = cardClass ? GetClassString(cardClass) : '';
 
