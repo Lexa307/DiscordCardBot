@@ -6,10 +6,10 @@ const LOCALES = require('../constants/locales.js');
 
 function ActivateCode (message, args, client) {
     UserCheck(message.author.id);
-    if (args.length == 1) {
+    if (args.length > 0) {
         let obj = ReadDBFile();
         // check code if exists
-        let userCode = args[0];
+        let userCode = args.join(' '); //user can ativate code using default space
         let dbCode = obj.codes.find(elem => {return elem.code === userCode })
         if (dbCode.active) {
             // check date restrictions of code

@@ -10,7 +10,8 @@ const INVENTORY_PUBLIC_ACCESS = parseInt(process.env.INVENTORY_PUBLIC_ACCESS);
 const MOD_ROLE_NAME = process.env.MOD_ROLE_NAME;
 const RESET_LOCAL_TIME = (process.env.RESET_LOCAL_TIME).split(':');
 const LANG = process.env.LOCALES;
-const SPACE_REGEX = new RegExp(`/${process.env.SPACE_SYMBOL}/g`);
+const SPACE_REGEX = process.env.SPACE_SYMBOL //new RegExp(`${process.env.SPACE_SYMBOL}/g`);
+console.log(SPACE_REGEX);
 module.exports = {
     INVENTORY_TIME,
     RESET_LOCAL_TIME,
