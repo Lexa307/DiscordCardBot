@@ -2,6 +2,7 @@ const UserCheck = require("../utils/UserCheck.js");
 const ReadDBFile = require("../utils/ReadDBFile.js");
 const CONSTANTS = require("../constants/constants.js");
 const SaveObjToDB = require("../utils/SaveObjToDB.js");
+// NOTE: Removed AttachmentBuilder from imports as we are not uploading the file.
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const GetClassString = require("../utils/GetClassString.js");
 const ReplaceEmojisFromNameToClass = require("../utils/ClassFromName.js");
@@ -112,7 +113,7 @@ function updateInventory(userData, newCard) {
     const sameCardCount = userCard.count; 
     let reRollFlag = (sameCardCount > 0 && sameCardCount % 3 === 0);
 
-    // NEW: Set flag on user data if a re-roll is earned
+    // Set flag on user data if a re-roll is earned
     if (reRollFlag) {
         userData.rerollAvailable = true;
     }
@@ -142,8 +143,6 @@ async function showGivenCard(message, card, reRollFlag, obj, userData, client, i
 
     let title;
     if (isBonusDrop) {
-        // If it's a bonus drop, check if the user ran the command manually (rerollAvailable consumed) or via button (isReroll)
-        // Note: The logic in handleCardDrop ensures isReroll is true if it was manually consumed.
         title = LOCALES.DropCard__MessageEmbed__got_bonus_card[CONSTANTS.LANG] || "You got a bonus drop:";
     } else {
         title = LOCALES.DropCard__MessageEmbed__got_card_with_name[CONSTANTS.LANG] || "You got a card named:";
@@ -151,8 +150,23 @@ async function showGivenCard(message, card, reRollFlag, obj, userData, client, i
     
     embed.setTitle(title); 
     embed.setDescription(`**${(cardClassString) ? cardClassString : ReplaceEmojisFromNameToClass(card)} [${card.name}](${card.url})**`);
-    embed.setImage(`${card.url}`);
     embed.setFooter({ text: `${LOCALES.DropCard__MessageEmbed__cards_you_have_now[CONSTANTS.LANG]} ${sameCardCount}` });
+
+    const isVideo = card.url.toLowerCase().endsWith('.mp4');
+
+    if (isVideo) {
+        // Add a field to the embed indicating a video was dropped (for clarity)
+        embed.addFields({ 
+            name: `🎥 ${LOCALES.DropCard__VideoTitle[CONSTANTS.LANG]}`, 
+            value: `${LOCALES.DropCard__VideoMessage[CONSTANTS.LANG]}`, 
+            inline: false 
+        });
+        // Remove the image from the embed since it's a video
+        embed.setImage(null);
+    } else {
+        // Standard image display
+        embed.setImage(`${card.url}`);
+    }
 
     let components = [];
 
@@ -173,8 +187,20 @@ async function showGivenCard(message, card, reRollFlag, obj, userData, client, i
         components.push(row);
     }
 
-    const messageReply = await message.reply({ embeds: [embed], components: components });
+    // Send the main embed/button message
+    const messageReply = await message.reply({ 
+        embeds: [embed], 
+        components: components, 
+    });
     
+    // --- SECOND MESSAGE FOR PLAYABLE VIDEO LINK ---
+    if (isVideo) {
+        // Send a new, separate message containing only the MP4 link for the Discord player
+        await message.channel.send(card.url);
+    }
+    // --- END SECOND MESSAGE ---
+
+
     // Start collector if reRollFlag is set
     if (reRollFlag) {
         const row = components[0]; 
@@ -204,9 +230,7 @@ async function showGivenCard(message, card, reRollFlag, obj, userData, client, i
 
         collector.on('end', async (collected, reason) => {
             if (reason === 'time' && messageReply.editable) {
-                // If the user used the command instead of the button, the flag is already false.
-                // If the user did nothing, the flag is still true, and we should keep the button active.
-                // If we disable the button after timeout, we should clear the flag.
+                // If the user did nothing, the flag is still true, and we should clear it.
                  if (userData.rerollAvailable) {
                      userData.rerollAvailable = false;
                      SaveObjToDB(obj);
@@ -264,17 +288,14 @@ async function handleCardDrop(message, obj, client, isReroll = false, isAmnesiaB
     }
 
     if (canDrop) {
-        // NEW: If the manual drop is consuming the 'rerollAvailable' flag, treat it as a bonus re-roll.
+        // If the manual drop is consuming the 'rerollAvailable' flag.
         if (userData.rerollAvailable) {
             userData.rerollAvailable = false;
-            // Set isReroll to true for display purposes, but don't reset the timer below.
+            // Set isReroll to true for display purposes (shows "Bonus Drop").
             isReroll = true; 
-            // The class must be defined here if the user ran the command *without* the button.
-            // Since we don't know the class of the triggering card, we must force a random card here, 
-            // OR store the class of the card that granted the reroll.
-            // For simplicity, we will assume if manual call, rerollClass is null for a full random reroll.
         }
         
+        // Get the card
         const rCard = GetRandomCard(obj.cards, rerollClass); 
         
         if (!rCard) {
@@ -284,12 +305,11 @@ async function handleCardDrop(message, obj, client, isReroll = false, isAmnesiaB
             return message.reply("Error: No active cards available to drop.");
         }
 
-        // 1. Update Inventory and get results (This updates 'rerollAvailable' if a new reroll is earned)
+        // 1. Update Inventory and get results (This updates 'rerollAvailable' if a *new* reroll is earned)
         const { reRollFlag } = updateInventory(userData, rCard);
 
         // 2. Update Drop Date:
         // Timer resets only if it was a standard drop OR the Amnesia bonus drop.
-        // It should NOT reset for a button-triggered drop (isReroll) or a manual drop consuming the free turn.
         if (!isReroll) {
              userData.lastDropDate = new Date();
         } 
@@ -329,7 +349,6 @@ const DropCard = (message, args, client) => {
     }
     
     // Call the main logic handler (Standard drop attempt)
-    // Note: Since this is the initial call, isReroll and isAmnesiaBonus are false, and rerollClass is null.
     handleCardDrop(message, obj, client, false, false);
 };
 

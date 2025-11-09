@@ -80,7 +80,7 @@ const LOCALES = {
         jp: `ボーナスカードを手に入れた: `,
     },
     DropCard__RerollButton: {
-        ru: `Бонусная крутка`,
+        ru: `Бонусный ролл того же класса карточки`,
         en: `Reroll Card`,
         jp: `カードを再ロールする`,
     },
@@ -93,6 +93,16 @@ const LOCALES = {
         ru: `Бонусный ролл истёк`,
         en: `Reroll Expired`,
         jp: `再ロールが期限切れ`,
+    },
+    DropCard__VideoTitle: {
+        ru: `Выпала видео карточка`,
+        en: `Video Card Dropped`,
+        jp: `ビデオカードを落とした`,
+    },
+    DropCard__VideoMessage: {
+        ru: `Видео контент показан в следующем сообщении.`,
+        en: `The video content is displayed in the following message.`,
+        jp: `ビデオコンテンツは次のメッセージに表示されます。`,
     },
 
 
