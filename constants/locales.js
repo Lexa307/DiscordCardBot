@@ -49,6 +49,52 @@ const LOCALES = {
         en: `Once every 24 hours, a random card is placed in your inventory when using this command`,
         jp: `このコマンドを使用すると、24時間ごとにランダムなカードがインベントリに配置されます`
     },
+    DropCard__AmnesiaTitle: {
+        ru: `Деменция прогресирует`,
+        en: `Dementia is progressing`,
+        jp: `認知症が進行している`
+    },
+    DropCard__AmnesiaMessage: {
+        ru: `В попытках выбить карту ты забыл что у тебя были следующие карты:`,
+        en: `In your attempts to knock out a card, you forgot that you had the following cards:`,
+        jp: `カードをノックアウトしようとするときに、次のカードがあることを忘れました:`
+    },
+    DropCard__AmnesiaLostCards: {
+        ru: `Забытые карты:`,
+        en: `Lost Cards:`,
+        jp: `忘れられたカード:`
+    },
+    DropCard__AmnesiaBonusDrop: {
+        ru: `Осознав это ты получаешь еще одну карту.`,
+        en: `Due to the shock, you receive a bonus drop.`,
+        jp: `ショックにより、ボーナスドロップを受け取ります。`
+    },
+    DropCard__MessageEmbed__got_reroll_card: {
+        ru: `Вы рерольнули и получили: `,
+        en: `You re-rolled and got: `,
+        jp: `再ロールで得たもの: `,
+    },
+    DropCard__MessageEmbed__got_bonus_card: { // Used for Amnesia bonus drop or any generic bonus
+        ru: `Вы получили бонусную карту: `,
+        en: `You got a bonus card: `,
+        jp: `ボーナスカードを手に入れた: `,
+    },
+    DropCard__RerollButton: {
+        ru: `Бонусная крутка`,
+        en: `Reroll Card`,
+        jp: `カードを再ロールする`,
+    },
+    DropCard__RerollUsed: {
+        ru: `Бонусный ролл использован`,
+        en: `Reroll Used`,
+        jp: `再ロールを使用済み`,
+    },
+    DropCard__RerollExpired: {
+        ru: `Бонусный ролл истёк`,
+        en: `Reroll Expired`,
+        jp: `再ロールが期限切れ`,
+    },
+
 
     Profile__MessageEmbed__wrong_user: {
         ru: `Для просмотра профиля учаcтника необходимо упомянуть только его`,
